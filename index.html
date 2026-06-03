@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tibbiy Ombor Tizimi</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#f0f4f8}
+.header{background:#1a5276;color:white;padding:15px 20px;display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:20px}
+.nav{background:#2c5f8a;display:flex;gap:5px;padding:8px 20px;flex-wrap:wrap}
+.nav button{background:transparent;color:white;border:1px solid rgba(255,255,255,0.3);padding:8px 16px;border-radius:5px;cursor:pointer;font-size:14px;transition:0.2s}
+.nav button:hover,.nav button.active{background:rgba(255,255,255,0.2);border-color:white}
+.content{padding:20px;max-width:1400px;margin:0 auto}
+.card{background:white;border-radius:10px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.card h2{color:#1a5276;margin-bottom:15px;font-size:18px;border-bottom:2px solid #eee;padding-bottom:10px}
+.stats{display:flex;flex-wrap:wrap;gap:15px;margin-bottom:20px}
+.stat-card{background:white;border-radius:10px;padding:20px;flex:1;min-width:150px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.1);border-left:4px solid #2c5f8a}
+.stat-card .value{font-size:28px;font-weight:bold;color:#1a5276}
+.stat-card .label{font-size:12px;color:#666;margin-top:5px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:15px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:13px;color:#555;font-weight:bold}
+.form-group input,.form-group select,.form-group textarea{padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;outline:none;transition:0.2s}
+.form-group input:focus,.form-group select:focus{border-color:#2c5f8a;box-shadow:0 0 0 2px rgba(44,95,138,0.1)}
+.btn{padding:9px 18px;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:bold;transition:0.2s}
+.btn-primary{background:#1a5276;color:white}
+.btn-success{background:#1e8449;color:white}
+.btn-warning{background:#d35400;color:white}
+.btn-danger{background:#c0392b;color:white}
+.btn-info{background:#2980b9;color:white}
+.btn-purple{background:#7d3c98;color:white}
+.btn:hover{opacity:0.85;transform:translateY(-1px)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{background:#1a5276;color:white;padding:10px 12px;text-align:left}
+td{padding:9px 12px;border-bottom:1px solid #eee}
+tr:hover{background:#f8f9fa}
+.badge{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:bold}
+.badge-jarayonda{background:#fef9e7;color:#d35400;border:1px solid #f39c12}
+.badge-sotildi{background:#eafaf1;color:#1e8449;border:1px solid #27ae60}
+.badge-qaytarildi{background:#fdedec;color:#c0392b;border:1px solid #e74c3c}
+.badge-chiqarilgan{background:#eaf2ff;color:#2980b9;border:1px solid #3498db}
+.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;overflow-y:auto}
+.modal.show{display:flex;align-items:flex-start;justify-content:center;padding:30px 15px}
+.modal-box{background:white;border-radius:12px;padding:25px;width:100%;max-width:700px;margin-top:20px}
+.modal-box h3{color:#1a5276;margin-bottom:20px;font-size:18px}
+.modal-footer{margin-top:20px;display:flex;gap:10px;justify-content:flex-end}
+.search-bar{padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;width:250px;outline:none}
+.filter-bar{display:flex;gap:10px;align-items:center;margin-bottom:15px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="header">
+<h1>Tibbiy Ombor Boshqaruv Tizimi</h1>
+<span id="sv" style="font-size:13px;opacity:0.8;"></span>
+</div>
+<div class="nav">
+<button class="active" onclick="page('bosh',event)">Bosh sahifa</button>
+<button onclick="page('mahsulotlar',event)">Mahsulotlar</button>
+<button onclick="page('kontragentlar',event)">Kontragentlar</button>
+<button onclick="page('kirim',event)">Kirim</button>
+<button onclick="page('zakazlar',event)">Zakazlar</button>
+<button onclick="page('hisobot',event)">Hisobot</button>
+</div>
+<div class="content" id="content"></div>
+<div class="modal" id="modal"><div class="modal-box" id="mc"></div></div>
+<script>
+const API='http://localhost:5000/api';
+setInterval(()=>{const d=new Date();document.getElementById('sv').textContent=d.toLocaleString('uz-UZ');},1000);
+function moch(h){document.getElementById('mc').innerHTML=h;document.getElementById('modal').classList.add('show');}
+function myop(){document.getElementById('modal').classList.remove('show');}
+document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)myop();});
+function page(n,e){document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));if(e)e.target.classList.add('active');({bosh:bosh,mahsulotlar:mah,kontragentlar:kon,kirim:kir,zakazlar:zak,hisobot:hiso})[n]();}
+async function api(u,m='GET',d=null){const o={method:m,headers:{'Content-Type':'application/json'}};if(d)o.body=JSON.stringify(d);const r=await fetch(API+u,o);return r.json();}
+function pul(n){return Number(n||0).toLocaleString('uz-UZ')+" so'm";}
+
+async function bosh(){
+const h=await api('/hisobot');
+const m=await api('/mahsulotlar');
+let pw='';
+if(h.past_qoldiq&&h.past_qoldiq.length>0){
+pw='<div class="card"><h2>Kam Qoldiq (5 ta va kam)</h2><table><tr><th>Mahsulot</th><th>Razmer</th><th>Qoldiq</th><th>Lot</th></tr>'+h.past_qoldiq.map(p=>'<tr><td>'+p.nomi+'</td><td>'+p.razmeri+'</td><td style="color:red;font-weight:bold">'+p.qoldiq+'</td><td>'+(p.lot_raqami||'-')+'</td></tr>').join('')+'</table></div>';}
+document.getElementById('content').innerHTML='<div class="stats"><div class="stat-card"><div class="value">'+m.length+'</div><div class="label">Mahsulot turlari</div></div><div class="stat-card"><div class="value">'+h.jami_zakaz+'</div><div class="label">Jami zakazlar</div></div><div class="stat-card"><div class="value" style="color:#d35400">'+h.jarayonda+'</div><div class="label">Jarayondagi</div></div><div class="stat-card"><div class="value" style="color:#1e8449">'+h.sotildi+'</div><div class="label">Sotilganlar</div></div><div class="stat-card"><div class="value" style="color:#c0392b">'+h.vozvrat_son+'</div><div class="label">Vozvratlar</div></div><div class="stat-card"><div class="value" style="color:#7d3c98">'+pul(h.jami_tolov)+'</div><div class="label">Jami tushum</div></div><div class="stat-card"><div class="value" style="color:#c0392b">'+pul(h.jami_nalog)+'</div><div class="label">Med nalog</div></div><div class="stat-card"><div class="value" style="color:#1e8449">'+pul(h.sof_daromad)+'</div><div class="label">Sof daromad</div></div></div>'+pw;}
+
+async function mah(q=''){
+let ms=await api('/mahsulotlar');
+if(q)ms=ms.filter(m=>m.nomi.toLowerCase().includes(q.toLowerCase())||m.razmeri.toLowerCase().includes(q.toLowerCase())||(m.lot_raqami||'').toLowerCase().includes(q.toLowerCase()));
+document.getElementById('content').innerHTML='<div class="card"><h2>Mahsulotlar</h2><div class="filter-bar"><input class="search-bar" placeholder="Qidirish..." oninput="mah(this.value)" value="'+q+'"><button class="btn btn-success" onclick="mah_qosh_m()">+ Yangi Mahsulot</button></div><table><tr><th>#</th><th>Nomi</th><th>Razmeri</th><th>Lot</th><th>Tannarx</th><th>Sotuv narx</th><th>Qoldiq</th><th></th></tr>'+ms.map(m=>'<tr><td>'+m.id+'</td><td><b>'+m.nomi+'</b></td><td>'+m.razmeri+'</td><td>'+(m.lot_raqami||'-')+'</td><td>'+pul(m.tannarx)+'</td><td>'+pul(m.sotuv_narx)+'</td><td>'+(m.qoldiq<=5?'<span style="color:red;font-weight:bold">'+m.qoldiq+' !</span>':m.qoldiq)+'</td><td><button class="btn btn-info" style="padding:4px 10px;font-size:12px" onclick="mah_tahr('+m.id+')">Tahrir</button></td></tr>').join('')+'</table></div>';}
+
+function mah_qosh_m(){moch('<h3>Yangi Mahsulot</h3><div class="form-grid"><div class="form-group"><label>Nomi *</label><input id="mn" placeholder="Nomi"></div><div class="form-group"><label>Razmeri *</label><input id="mr" placeholder="44, L, XL"></div><div class="form-group"><label>Lot raqami</label><input id="ml" placeholder="Lot"></div><div class="form-group"><label>Tannarx</label><input id="mt" type="number" placeholder="0"></div><div class="form-group"><label>Sotuv narxi</label><input id="ms" type="number" placeholder="0"></div><div class="form-group"><label>Qoldiq</label><input id="mq" type="number" placeholder="0"></div></div><div class="form-group"><label>Izoh</label><textarea id="mi" rows="2" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:100%"></textarea></div><div class="modal-footer"><button class="btn btn-success" onclick="mah_saq()">Saqlash</button><button class="btn" style="background:#eee" onclick="myop()">Bekor</button></div>');}
+
+async function mah_saq(){
+const n=document.getElementById('mn').value.trim();
+const r=document.getElementById('mr').value.trim();
+if(!n||!r){alert('Nomi va razmeri majburiy!');return;}
+await api('/mahsulotlar','POST',{nomi:n,razmeri:r,lot_raqami:document.getElementById('ml').value,tannarx:parseFloat(document.getElementById('mt').value)||0,sotuv_narx:parseFloat(document.getElementById('ms').value)||0,qoldiq:parseInt(document.getElementById('mq').value)||0,izoh:document.getElementById('mi').value});
+myop();mah();}
+
+async function mah_tahr(id){
+const ms=await api('/mahsulotlar');
+const m=ms.find(x=>x.id===id);if(!m)return;
+moch('<h3>Mahsulotni Tahrirlash</h3><div class="form-grid"><div class="form-group"><label>Nomi *</label><input id="mn" value="'+m.nomi+'"></div><div class="form-group"><label>Razmeri *</label><input id="mr" value="'+m.razmeri+'"></div><div class="form-group"><label>Lot</label><input id="ml" value="'+(m.lot_raqami||'')+'"></div><div class="form-group"><label>Tannarx</label><input id="mt" type="number" value="'+m.tannarx+'"></div><div class="form-group"><label>Sotuv narxi</label><input id="ms" type="number" value="'+m.sotuv_narx+'"></div><div class="form-group"><label>Qoldiq</label><input id="mq" type="number" value="'+m.qoldiq+'"></div></div><div class="form-group"><label>Izoh</label><textarea id="mi" rows="2" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:100%">'+(m.izoh||'')+'</textarea></div><div class="modal-footer"><button class="btn btn-success" onclick="mah_yan('+id+')">Saqlash</button><button class="btn" style="background:#eee" onclick="myop()">Bekor</button></div>');}
+
+async function mah_yan(id){
+await api('/mahsulotlar/'+id,'PUT',{nomi:document.getElementById('mn').value,razmeri:document.getElementById('mr').value,lot_raqami:document.getElementById('ml').value,tannarx:parseFloat(document.getElementById('mt').value)||0,sotuv_narx:parseFloat(document.getElementById('ms').value)||0,qoldiq:parseInt(document.getElementById('mq').value)||0,izoh:document.getElementById('mi').value});
+myop();mah();}
+
+async function kon(q=''){
+let ks=await api('/kontragentlar');
+if(q)ks=ks.filter(k=>k.ismi.toLowerCase().includes(q.toLowerCase())||(k.telefon||'').includes(q));
+document.getElementById('content').innerHTML='<div class="card"><h2>Kontragentlar</h2><div class="filter-bar"><input class="search-bar" placeholder="Qidirish..." oninput="kon(this.value)" value="'+q+'"><button class="btn btn-success" onclick="kon_qosh_m()">+ Yangi</button></div><table><tr><th>#</th><th>Ismi</th><th>Telefon</th><th>Manzil</th><th>Izoh</th><th></th></tr>'+ks.map(k=>'<tr><td>'+k.id+'</td><td><b>'+k.ismi+'</b></td><td>'+(k.telefon||'-')+'</td><td>'+(k.manzil||'-')+'</td><td>'+(k.izoh||'-')+'</td><td><button class="btn btn-info" style="padding:4px 10px;font-size:12px" onclick="kon_tahr('+k.id+')">Tahrir</button></td></tr>').join('')+'</table></div>';}
+
+function kon_qosh_m(){moch('<h3>Yangi Kontragent</h3><div class="form-grid"><div class="form-group"><label>Ismi *</label><input id="ki" placeholder="To'liq ismi"></div><div class="form-group"><label>Telefon</label><input id="kt" placeholder="+998 90 ..."></div><div class="form-group" style="grid-column:span 2"><label>Manzil</label><input id="km" placeholder="Shahar, ko'cha"></div></div><div class="form-group"><label>Izoh</label><textarea id="kiz" rows="2" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:100%"></textarea></div><div class="modal-footer"><button class="btn btn-success" onclick="kon_saq()">Saqlash</button><button class="btn" style="background:#eee" onclick="myop()">Bekor</button></div>');}
+
+async function kon_saq(){
+const i=document.getElementById('ki').value.trim();
+if(!i){alert('Ismi majburiy!');return;}
+await api('/kontragentlar','POST',{ismi:i,telefon:document.getElementById('kt').value,manzil:document.getElementById('km').value,izoh:document.getElementById('kiz').value});
+myop();kon();}
+
+async function kon_tahr(id){
+const ks=await api('/kontragentlar');
+const k=ks.find(x=>x.id===id);if(!k)return;
+moch('<h3>Kontragentni Tahrirlash</h3><div class="form-grid"><div class="form-group"><label>Ismi *</label><input id="ki" value="'+k.ismi+'"></div><div class="form-group"><label>Telefon</label><input id="kt" value="'+(k.telefon||'')+'"></div><div class="form-group" style="grid-column:span 2"><label>Manzil</label><input id="km" value="'+(k.manzil||'')+'"></div></div><div class="form-group"><label>Izoh</label><textarea id="kiz" rows="2" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:100%">'+(k.izoh||'')+'</textarea></div><div class="modal-footer"><button class="btn btn-success" onclick="kon_yan('+id+')">Saqlash</button><button class="btn" style="background:#eee" onclick="myop()">Bekor</button></div>');}
+
+async function kon_yan(id){
+await api('/kontragentlar/'+id,'PUT',{ismi:document.getElementById('ki').value,telefon:document.getElementById('kt').value,manzil:document.getElementById('km').value,izoh:document.getElementById('kiz').value});
+myop();kon();}
+
+async function kir(){
+const ms=await api('/mahsulotlar');
+const ks=await api('/kirimlar');
+document.getElementById('content').innerHTML='<div class="card"><h2>Skladga Kirim</h2><div class="form-grid"><div class="form-group"><label>Mahsulot *</label><select id="km" onchange="knar()"><option value="">-- Tanlang --</option>'+ms.map(m=>'<option value="'+m.id+'" data-narx="'+m.tannarx+'">'+m.nomi+' - '+m.razmeri+' (qoldiq: '+m.qoldiq+')</option>').join('')+'</select></div><div class="form-group"><label>Miqdor *</label><input id="kmi" type="number" placeholder="0" min="1"></div><div class="form-group"><label>Tannarx (so'm)</label><input id="ktn" type="number" placeholder="0"></div><div class="form-group"><label>Izoh</label><input id="kiz" placeholder="Ixtiyoriy"></div></div><button class="btn btn-success" onclick="kir_saq()">Kirdi deb belgilash</button></div><div class="card"><h2>Kirimlar Tarixi</h2><table><tr><th>#</th><th>Mahsulot</th><th>Razmer</th><th>Miqdor</th><th>Tannarx</th><th>Sana</th><th>Izoh</th></tr>'+ks.map(k=>'<tr><td>'+k.id+'</td><td><b>'+k.nomi+'</b></td><td>'+k.razmeri+'</td><td><b>'+k.miqdor+'</b></td><td>'+pul(k.tannarx)+'</td><td>'+k.sana+'</td><td>'+(k.izoh||'-')+'</td></tr>').join('')+'</table></div>';}
+
+function knar(){const o=document.getElementById('km').options[document.getElementById('km').selectedIndex];document.getElementById('ktn').value=o.dataset.narx||0;}
+
+async function kir_saq(){
+const mid=document.getElementById('km').value;
+const miq=parseInt(document.getElementById('kmi').value);
+if(!mid||!miq){alert('Mahsulot va miqdorni kiriting!');return;}
+await api('/kirim','POST',{mahsulot_id:parseInt(mid),miqdor:miq,tannarx:parseFloat(document.getElementById('ktn').value)||0,izoh:document.getElementById('kiz').value});
+alert('Kirim qoshildi!');kir();}
+
+async function zak(hf=''){
+const url=hf?'/zakazlar?holat='+hf:'/zakazlar';
+const zs=await api(url);
+document.getElementById('content').innerHTML='<div class="card"><h2>Zakazlar</h2><div class="filter-bar"><button class="btn '+(hf===''?'btn-primary':'btn-info')+'" onclick="zak('')">Barchasi</button><button class="btn '+(hf==='Jarayonda'?'btn-primary':'btn-warning')+'" onclick="zak('Jarayonda')">Jarayonda</button><button class="btn '+(hf==='Sotildi'?'btn-primary':'btn-success')+'" onclick="zak('Sotildi')">Sotildi</button><button class="btn btn-success" onclick="yangi_zak()" style="margin-left:auto">+ Yangi Zakaz</button></div><table><tr><th>#</th><th>Mijoz</th><th>Telefon</th><th>Sana</th><th>To'lov</th><th>Med nalog</th><th>Holat</th><th></th></tr>'+zs.map(z=>'<tr><td>'+z.id+'</td><td><b>'+z.ismi+'</b></td><td>'+(z.telefon||'-')+'</td><td>'+z.sana+'</td><td>'+pul(z.tolov)+'</td><td>'+pul(z.med_nalog)+'</td><td><span class="badge badge-'+z.holat.toLowerCase()+'">'+z.holat+'</span></td><td><button class="btn btn-info" style="padding:4px 10px;font-size:12px" onclick="zd('+z.id+')">Ko'rish</button></td></tr>').join('')+'</table></div>';}
+
+async function yangi_zak(){
+const ks=await api('/kontragentlar');
+const ms=await api('/mahsulotlar');
+window._zt=[];
+moch('<h3>Yangi Zakaz</h3><div class="form-grid"><div class="form-group"><label>Kontragent *</label><select id="zk"><option value="">-- Tanlang --</option>'+ks.map(k=>'<option value="'+k.id+'">'+k.ismi+(k.telefon?' ('+k.telefon+')':'')+'</option>').join('')+'</select></div><div class="form-group"><label>To'lov (so'm)</label><input id="zt" type="number" placeholder="0"></div><div class="form-group"><label>Med nalog</label><input id="zn" type="number" placeholder="0"></div><div class="form-group"><label>Izoh</label><input id="zi" placeholder="Ixtiyoriy"></div></div><div style="margin:15px 0"><b>Chiqariladigan Tovarlar:</b></div><div id="ztl"></div><div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap"><select id="zm" onchange="znr()" style="flex:2;padding:8px;border:1px solid #ddd;border-radius:6px"><option value="">-- Mahsulot --</option>'+ms.filter(m=>m.qoldiq>0).map(m=>'<option value="'+m.id+'" data-narx="'+m.sotuv_narx+'">'+m.nomi+' - '+m.razmeri+' ('+m.qoldiq+')</option>').join('')+'</select><input id="zmq" type="number" value="1" min="1" style="width:70px;padding:8px;border:1px solid #ddd;border-radius:6px"><input id="znx" type="number" placeholder="Narx" style="width:130px;padding:8px;border:1px solid #ddd;border-radius:6px"><button class="btn btn-success" onclick="ztq()">+</button></div><div class="modal-footer"><button class="btn btn-success" onclick="zsaq()">Zakazni Ochish</button><button class="btn" style="background:#eee" onclick="myop()">Bekor</button></div>');}
+
+function znr(){const o=document.getElementById('zm').options[document.getElementById('zm').selectedIndex];document.getElementById('znx').value=o.dataset.narx||0;}
+function ztq(){
+const s=document.getElementById('zm');
+const mid=s.value;
+const mt=s.options[s.selectedIndex].text;
+const mq=parseInt(document.getElementById('zmq').value)||1;
+const nx=parseFloat(document.getElementById('znx').value)||0;
+if(!mid){alert('Mahsulot tanlang!');return;}
+window._zt.push({mahsulot_id:parseInt(mid),miqdor:mq,sotuv_narx:nx,text:mt});
+document.getElementById('ztl').innerHTML=window._zt.map((t,i)=>'<div style="background:#f8f9fa;padding:8px;border-radius:6px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center"><span>'+t.text+' x '+t.miqdor+' - '+pul(t.sotuv_narx)+'</span><button class="btn btn-danger" style="padding:2px 8px;font-size:12px" onclick="zto('+i+')">x</button></div>').join('');}
+
+function zto(i){window._zt.splice(i,1);document.getElementById('ztl').innerHTML=window._zt.map((t,j)=>'<div style="background:#f8f9fa;padding:8px;border-radius:6px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center"><span>'+t.text+' x '+t.miqdor+' - '+pul(t.sotuv_narx)+'</span><button class="btn btn-danger" style="padding:2px 8px;font-size:12px" onclick="zto('+j+')">x</button></div>').join('');}
+
+async function zsaq(){
+const kid=document.getElementById('zk').value;
+if(!kid){alert('Kontragent tanlang!');return;}
+if(!window._zt.length){alert('Kamida 1 ta tovar qoshing!');return;}
+const r=await api('/zakazlar','POST',{kontragent_id:parseInt(kid),tolov:parseFloat(document.getElementById('zt').value)||0,med_nalog:parseFloat(document.getElementById('zn').value)||0,izoh:document.getElementById('zi').value,tovarlar:window._zt});
+myop();alert('Zakaz #'+r.zakaz_id+' ochildi!');zak();}
+
+async function zd(id){
+const r=await api('/zakazlar/'+id);
+const z=r.zakaz;const ts=r.tovarlar;
+moch('<h3>Zakaz #'+id+'</h3><div style="background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:15px"><table style="width:auto"><tr><td style="padding:4px 10px;font-weight:bold">Mijoz:</td><td>'+z.ismi+'</td><td style="padding:4px 10px;font-weight:bold">Telefon:</td><td>'+(z.telefon||'-')+'</td></tr><tr><td style="padding:4px 10px;font-weight:bold">Sana:</td><td>'+z.sana+'</td><td style="padding:4px 10px;font-weight:bold">Holat:</td><td><span class="badge badge-'+z.holat.toLowerCase()+'">'+z.holat+'</span></td></tr><tr><td style="padding:4px 10px;font-weight:bold">Tolov:</td><td>'+pul(z.tolov)+'</td><td style="padding:4px 10px;font-weight:bold">Med nalog:</td><td>'+pul(z.med_nalog)+'</td></tr></table></div><b>Tovarlar:</b><table style="margin-top:10px"><tr><th>#</th><th>Mahsulot</th><th>Razmer</th><th>Lot</th><th>Miqdor</th><th>Narx</th><th>Holat</th><th>Amal</th></tr>'+ts.map(t=>'<tr><td>'+t.id+'</td><td>'+t.nomi+'</td><td>'+t.razmeri+'</td><td>'+(t.lot_raqami||'-')+'</td><td>'+t.miqdor+'</td><td>'+pul(t.sotuv_narx)+'</td><td><span class="badge badge-'+t.holat.toLowerCase()+'">'+t.holat+'</span></td><td>'+(t.holat==='Chiqarilgan'?'<button class="btn btn-warning" style="padding:3px 8px;font-size:11px" onclick="tvoz('+t.id+','+id+')">Vozvrat</button> <button class="btn btn-success" style="padding:3px 8px;font-size:11px" onclick="tsot('+t.id+','+id+','+t.sotuv_narx+')">Sotildi</button>':'')+'</td></tr>').join('')+'</table><div class="modal-footer"><button class="btn btn-purple" onclick="tol_yan('+id+','+z.tolov+','+z.med_nalog+')">Tolov Yangilash</button><button class="btn" style="background:#eee" onclick="myop()">Yopish</button></div>');}
+
+async function tvoz(tid,zid){
+if(!confirm('Bu tovarni qaytarildi deb belgilash?'))return;
+await api('/zakaz_tovar/'+tid+'/vozvrat','PUT',{});
+myop();zd(zid);}
+
+async function tsot(tid,zid,narx){
+const yn=prompt('Sotuv narxini kiriting (so'm):',narx);
+if(yn===null)return;
+await api('/zakaz_tovar/'+tid+'/sotildi','PUT',{sotuv_narx:parseFloat(yn)||narx});
+myop();zd(zid);}
+
+function tol_yan(zid,t,m){
+moch('<h3>Tolov Yangilash - Zakaz #'+zid+'</h3><div class="form-grid"><div class="form-group"><label>Tolов (so'm)</label><input id="tlt" type="number" value="'+t+'"></div><div class="form-group"><label>Med nalog</label><input id="tlm" type="number" value="'+m+'"></div></div><div class="modal-footer"><button class="btn btn-success" onclick="tol_saq('+zid+')">Saqlash</button><button class="btn" style="background:#eee" onclick="myop()">Bekor</button></div>');}
+
+async function tol_saq(zid){
+await api('/zakazlar/'+zid+'/tolov','PUT',{tolov:parseFloat(document.getElementById('tlt').value)||0,med_nalog:parseFloat(document.getElementById('tlm').value)||0});
+myop();zd(zid);}
+
+async function hiso(){
+const h=await api('/hisobot');
+document.getElementById('content').innerHTML='<div class="card"><h2>Hisobot</h2><div class="stats"><div class="stat-card"><div class="value">'+h.jami_zakaz+'</div><div class="label">Jami zakazlar</div></div><div class="stat-card"><div class="value" style="color:#d35400">'+h.jarayonda+'</div><div class="label">Jarayondagi</div></div><div class="stat-card"><div class="value" style="color:#1e8449">'+h.sotildi+'</div><div class="label">Sotilganlar</div></div><div class="stat-card"><div class="value" style="color:#c0392b">'+h.vozvrat_son+'</div><div class="label">Vozvratlar</div></div><div class="stat-card"><div class="value" style="color:#7d3c98">'+pul(h.jami_tolov)+'</div><div class="label">Jami tushum</div></div><div class="stat-card"><div class="value" style="color:#c0392b">'+pul(h.jami_nalog)+'</div><div class="label">Med nalog</div></div><div class="stat-card"><div class="value" style="color:#1e8449">'+pul(h.sof_daromad)+'</div><div class="label">Sof daromad</div></div></div></div>'+(h.past_qoldiq.length?'<div class="card"><h2>Kam Qoldiq</h2><table><tr><th>Mahsulot</th><th>Razmer</th><th>Qoldiq</th></tr>'+h.past_qoldiq.map(p=>'<tr><td>'+p.nomi+'</td><td>'+p.razmeri+'</td><td style="color:red;font-weight:bold">'+p.qoldiq+'</td></tr>').join('')+'</table></div>':'');}
+
+bosh();
+</script>
+</body>
+</html>
