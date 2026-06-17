@@ -3,204 +3,433 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tibbiy Ombor Tizimi</title>
+<title>MedStock ERP</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial,sans-serif;background:#f0f4f8}
-.header{background:#1a5276;color:white;padding:15px 20px;display:flex;align-items:center;justify-content:space-between}
-.header h1{font-size:20px}
-.nav{background:#2c5f8a;display:flex;gap:5px;padding:8px 20px;flex-wrap:wrap}
-.nav button{background:transparent;color:white;border:1px solid rgba(255,255,255,0.3);padding:8px 16px;border-radius:5px;cursor:pointer;font-size:14px;transition:0.2s}
-.nav button:hover,.nav button.active{background:rgba(255,255,255,0.2);border-color:white}
-.content{padding:20px;max-width:1400px;margin:0 auto}
-.card{background:white;border-radius:10px;padding:20px;margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
-.card h2{color:#1a5276;margin-bottom:15px;font-size:18px;border-bottom:2px solid #eee;padding-bottom:10px}
-.stats{display:flex;flex-wrap:wrap;gap:15px;margin-bottom:20px}
-.stat-card{background:white;border-radius:10px;padding:20px;flex:1;min-width:150px;text-align:center;box-shadow:0 2px 8px rgba(0,0,0,0.1);border-left:4px solid #2c5f8a}
-.stat-card .value{font-size:28px;font-weight:bold;color:#1a5276}
-.stat-card .label{font-size:12px;color:#666;margin-top:5px}
-.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:15px}
-.form-group{display:flex;flex-direction:column;gap:5px}
-.form-group label{font-size:13px;color:#555;font-weight:bold}
-.form-group input,.form-group select,.form-group textarea{padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;outline:none;transition:0.2s}
-.form-group input:focus,.form-group select:focus{border-color:#2c5f8a;box-shadow:0 0 0 2px rgba(44,95,138,0.1)}
-.btn{padding:9px 18px;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:bold;transition:0.2s}
-.btn-primary{background:#1a5276;color:white}
-.btn-success{background:#1e8449;color:white}
-.btn-warning{background:#d35400;color:white}
-.btn-danger{background:#c0392b;color:white}
-.btn-info{background:#2980b9;color:white}
-.btn-purple{background:#7d3c98;color:white}
-.btn:hover{opacity:0.85;transform:translateY(-1px)}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th{background:#1a5276;color:white;padding:10px 12px;text-align:left}
-td{padding:9px 12px;border-bottom:1px solid #eee}
-tr:hover{background:#f8f9fa}
-.badge{padding:3px 10px;border-radius:20px;font-size:12px;font-weight:bold}
-.badge-jarayonda{background:#fef9e7;color:#d35400;border:1px solid #f39c12}
-.badge-sotildi{background:#eafaf1;color:#1e8449;border:1px solid #27ae60}
-.badge-qaytarildi{background:#fdedec;color:#c0392b;border:1px solid #e74c3c}
-.badge-chiqarilgan{background:#eaf2ff;color:#2980b9;border:1px solid #3498db}
-.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;overflow-y:auto}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Arial,sans-serif}
+body{background:#eef2f7;color:#1f2a37}
+.header{background:#0f3d5e;color:#fff;padding:12px 22px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.header h1{font-size:19px;display:flex;align-items:center;gap:8px}
+.header .right{display:flex;align-items:center;gap:14px;font-size:13px}
+.header .right b{font-weight:600}
+.logout{background:#c0392b;color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:13px}
+.nav{background:#15517a;display:flex;gap:4px;padding:7px 18px;flex-wrap:wrap}
+.nav button{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.25);padding:8px 15px;border-radius:6px;cursor:pointer;font-size:13.5px;transition:.15s}
+.nav button:hover,.nav button.active{background:rgba(255,255,255,.2);border-color:#fff}
+.content{padding:20px;max-width:1500px;margin:0 auto}
+.card{background:#fff;border-radius:10px;padding:20px;margin-bottom:18px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.card h2{color:#0f3d5e;margin-bottom:14px;font-size:17px;border-bottom:2px solid #eef2f7;padding-bottom:9px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.stats{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:18px}
+.stat-card{background:#fff;border-radius:10px;padding:18px;flex:1;min-width:155px;box-shadow:0 1px 4px rgba(0,0,0,.08);border-left:4px solid #15517a}
+.stat-card .value{font-size:24px;font-weight:700;color:#0f3d5e}
+.stat-card .label{font-size:12px;color:#6b7785;margin-top:4px}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:11px;margin-bottom:14px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-size:12.5px;color:#54616e;font-weight:600}
+input,select,textarea{padding:8px 11px;border:1px solid #d3dae3;border-radius:6px;font-size:13.5px;outline:none;transition:.15s;background:#fff}
+input:focus,select:focus,textarea:focus{border-color:#15517a;box-shadow:0 0 0 2px rgba(21,81,122,.12)}
+.btn{padding:8px 16px;border:none;border-radius:6px;cursor:pointer;font-size:13.5px;font-weight:600;transition:.15s}
+.btn:hover{opacity:.9}
+.btn-primary{background:#0f3d5e;color:#fff}.btn-success{background:#1e8449;color:#fff}
+.btn-warning{background:#d35400;color:#fff}.btn-danger{background:#c0392b;color:#fff}
+.btn-info{background:#2471a3;color:#fff}.btn-light{background:#e5eaf0;color:#333}
+.btn-sm{padding:4px 9px;font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#0f3d5e;color:#fff;padding:9px 10px;text-align:left;white-space:nowrap;position:sticky;top:0}
+td{padding:7px 10px;border-bottom:1px solid #eef2f7;white-space:nowrap}
+tr:hover{background:#f6f9fc}
+.tbl-wrap{overflow-x:auto;border:1px solid #eef2f7;border-radius:8px}
+.badge{padding:3px 10px;border-radius:14px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.b-prodaja{background:#eafaf1;color:#1e8449;border:1px solid #82e0aa}
+.b-vozvrat{background:#fdedec;color:#c0392b;border:1px solid #f1948a}
+.b-otpravlen{background:#eaf2fb;color:#2471a3;border:1px solid #85c1e9}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;overflow-y:auto}
 .modal.show{display:flex;align-items:flex-start;justify-content:center;padding:30px 15px}
-.modal-box{background:white;border-radius:12px;padding:25px;width:100%;max-width:700px;margin-top:20px}
-.modal-box h3{color:#1a5276;margin-bottom:20px;font-size:18px}
-.modal-footer{margin-top:20px;display:flex;gap:10px;justify-content:flex-end}
-.search-bar{padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;width:250px;outline:none}
-.filter-bar{display:flex;gap:10px;align-items:center;margin-bottom:15px;flex-wrap:wrap}
+.modal-box{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:760px;margin-top:10px}
+.modal-box h3{color:#0f3d5e;margin-bottom:18px;font-size:17px}
+.modal-footer{margin-top:18px;display:flex;gap:9px;justify-content:flex-end}
+.search-bar{width:260px}
+.filter-bar{display:flex;gap:9px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.spacer{margin-left:auto}
+/* Login */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f3d5e,#15517a)}
+.login-box{background:#fff;border-radius:14px;padding:36px;width:360px;box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.login-box h2{color:#0f3d5e;text-align:center;margin-bottom:6px}
+.login-box p{text-align:center;color:#8a96a3;font-size:13px;margin-bottom:22px}
+.login-box .form-group{margin-bottom:14px}
+.login-box .btn{width:100%;padding:11px}
+.err{color:#c0392b;font-size:13px;margin-top:10px;text-align:center;min-height:18px}
+.muted{color:#8a96a3;font-size:12px}
+.top-rank{background:#fef9e7;font-weight:700}
+@media print{.header,.nav,.filter-bar,.btn{display:none!important}.card{box-shadow:none}}
 </style>
 </head>
 <body>
-<div class="header">
-<h1>Tibbiy Ombor Boshqaruv Tizimi</h1>
-<span id="sv" style="font-size:13px;opacity:0.8;"></span>
+
+<!-- LOGIN -->
+<div id="loginScreen" class="login-wrap">
+  <div class="login-box">
+    <h2>MedStock ERP</h2>
+    <p>Ombor, sotuv va qaytarish tizimi</p>
+    <div class="form-group"><label>Login</label><input id="lgU" placeholder="admin" autocomplete="username"></div>
+    <div class="form-group"><label>Parol</label><input id="lgP" type="password" placeholder="••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+    <button class="btn btn-primary" onclick="doLogin()">Kirish</button>
+    <div class="err" id="lgErr"></div>
+    <div class="muted" style="text-align:center;margin-top:14px">Standart: admin / admin123</div>
+  </div>
 </div>
-<div class="nav">
-<button class="active" onclick="page('bosh',event)">Bosh sahifa</button>
-<button onclick="page('mahsulotlar',event)">Mahsulotlar</button>
-<button onclick="page('kontragentlar',event)">Kontragentlar</button>
-<button onclick="page('kirim',event)">Kirim</button>
-<button onclick="page('zakazlar',event)">Zakazlar</button>
-<button onclick="page('hisobot',event)">Hisobot</button>
+
+<!-- APP -->
+<div id="app" style="display:none">
+  <div class="header">
+    <h1>🦴 MedStock ERP</h1>
+    <div class="right">
+      <span id="clock"></span>
+      <span>👤 <b id="hdrUser"></b> <span id="hdrRole" class="muted"></span></span>
+      <button class="logout" onclick="logout()">Chiqish</button>
+    </div>
+  </div>
+  <div class="nav" id="nav"></div>
+  <div class="content" id="content"></div>
 </div>
-<div class="content" id="content"></div>
+
 <div class="modal" id="modal"><div class="modal-box" id="mc"></div></div>
+
 <script>
-const API='http://localhost:5000/api';
-setInterval(()=>{const d=new Date();document.getElementById('sv').textContent=d.toLocaleString('uz-UZ');},1000);
+const API = location.origin + '/api';
+let TOKEN = localStorage.getItem('ms_token') || '';
+let USER = JSON.parse(localStorage.getItem('ms_user') || 'null');
+
+/* ---------- helpers ---------- */
+function pul(n){return Number(n||0).toLocaleString('uz-UZ')+" so'm";}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
 function moch(h){document.getElementById('mc').innerHTML=h;document.getElementById('modal').classList.add('show');}
 function myop(){document.getElementById('modal').classList.remove('show');}
+function val(id){const e=document.getElementById(id);return e?e.value:'';}
 document.getElementById('modal').addEventListener('click',function(e){if(e.target===this)myop();});
-function page(n,e){document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));if(e)e.target.classList.add('active');({bosh:bosh,mahsulotlar:mah,kontragentlar:kon,kirim:kir,zakazlar:zak,hisobot:hiso})[n]();}
-async function api(u,m='GET',d=null){const o={method:m,headers:{'Content-Type':'application/json'}};if(d)o.body=JSON.stringify(d);const r=await fetch(API+u,o);return r.json();}
-function pul(n){return Number(n||0).toLocaleString('uz-UZ')+" so'm";}
 
-async function bosh(){
-const h=await api('/hisobot');
-const m=await api('/mahsulotlar');
-let pw='';
-if(h.past_qoldiq&&h.past_qoldiq.length>0){
-pw='<div class="card"><h2>Kam Qoldiq (5 ta va kam)</h2><table><tr><th>Mahsulot</th><th>Razmer</th><th>Qoldiq</th><th>Lot</th></tr>'+h.past_qoldiq.map(p=>'<tr><td>'+p.nomi+'</td><td>'+p.razmeri+'</td><td style="color:red;font-weight:bold">'+p.qoldiq+'</td><td>'+(p.lot_raqami||'-')+'</td></tr>').join('')+'</table></div>';}
-document.getElementById('content').innerHTML='<div class="stats"><div class="stat-card"><div class="value">'+m.length+'</div><div class="label">Mahsulot turlari</div></div><div class="stat-card"><div class="value">'+h.jami_zakaz+'</div><div class="label">Jami zakazlar</div></div><div class="stat-card"><div class="value" style="color:#d35400">'+h.jarayonda+'</div><div class="label">Jarayondagi</div></div><div class="stat-card"><div class="value" style="color:#1e8449">'+h.sotildi+'</div><div class="label">Sotilganlar</div></div><div class="stat-card"><div class="value" style="color:#c0392b">'+h.vozvrat_son+'</div><div class="label">Vozvratlar</div></div><div class="stat-card"><div class="value" style="color:#7d3c98">'+pul(h.jami_tolov)+'</div><div class="label">Jami tushum</div></div><div class="stat-card"><div class="value" style="color:#c0392b">'+pul(h.jami_nalog)+'</div><div class="label">Med nalog</div></div><div class="stat-card"><div class="value" style="color:#1e8449">'+pul(h.sof_daromad)+'</div><div class="label">Sof daromad</div></div></div>'+pw;}
+async function api(u,m='GET',d=null){
+  const o={method:m,headers:{'Content-Type':'application/json'}};
+  if(TOKEN)o.headers['Authorization']='Bearer '+TOKEN;
+  if(d)o.body=JSON.stringify(d);
+  const r=await fetch(API+u,o);
+  if(r.status===401){logout();throw new Error('401');}
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(j.error||'Xatolik');
+  return j;
+}
+function isAdmin(){return USER&&USER.role==='admin';}
 
+/* ---------- auth ---------- */
+async function doLogin(){
+  document.getElementById('lgErr').textContent='';
+  try{
+    const r=await fetch(API+'/login',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username:val('lgU'),password:val('lgP')})});
+    const j=await r.json();
+    if(!r.ok){document.getElementById('lgErr').textContent=j.error||'Xatolik';return;}
+    TOKEN=j.token;USER=j.user;
+    localStorage.setItem('ms_token',TOKEN);localStorage.setItem('ms_user',JSON.stringify(USER));
+    startApp();
+  }catch(e){document.getElementById('lgErr').textContent='Server bilan aloqa yo\'q';}
+}
+function logout(){
+  TOKEN='';USER=null;localStorage.removeItem('ms_token');localStorage.removeItem('ms_user');
+  document.getElementById('app').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+}
+
+/* ---------- nav ---------- */
+const PAGES=[
+  {k:'dash',t:'Dashboard',f:dash},
+  {k:'oper',t:'Operatsiyalar',f:oper},
+  {k:'mah',t:'Mahsulotlar',f:mah},
+  {k:'kon',t:'Kontragentlar',f:kon},
+  {k:'kpi',t:'Menejer KPI',f:kpi},
+  {k:'hisobot',t:'Hisobotlar',f:hisobot},
+  {k:'users',t:'Foydalanuvchilar',f:users,admin:true},
+  {k:'audit',t:'Audit log',f:audit,admin:true},
+];
+function buildNav(){
+  const nav=document.getElementById('nav');nav.innerHTML='';
+  PAGES.filter(p=>!p.admin||isAdmin()).forEach((p,i)=>{
+    const b=document.createElement('button');b.textContent=p.t;
+    b.onclick=()=>{document.querySelectorAll('#nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');p.f();};
+    if(i===0)b.classList.add('active');
+    nav.appendChild(b);
+  });
+}
+function startApp(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('hdrUser').textContent=USER.full_name||USER.username;
+  document.getElementById('hdrRole').textContent='('+(USER.role==='admin'?'Admin':'Menejer')+')';
+  buildNav();dash();
+}
+setInterval(()=>{const c=document.getElementById('clock');if(c)c.textContent=new Date().toLocaleString('uz-UZ');},1000);
+
+/* ============== DASHBOARD ============== */
+async function dash(){
+  const h=await api('/dashboard');
+  let pw='';
+  if(h.past_qoldiq&&h.past_qoldiq.length){
+    pw='<div class="card"><h2>⚠️ Kam qoldiq (5 va undan kam)</h2><div class="tbl-wrap"><table><tr><th>Artikul</th><th>Nomi</th><th>Birlik</th><th>Qoldiq</th></tr>'+
+    h.past_qoldiq.map(p=>'<tr><td>'+esc(p.artikul)+'</td><td>'+esc(p.nomi)+'</td><td>'+esc(p.birlik)+'</td><td style="color:#c0392b;font-weight:700">'+p.qoldiq+'</td></tr>').join('')+'</table></div></div>';
+  }
+  document.getElementById('content').innerHTML=
+  '<div class="stats">'+
+  st(h.jami_mahsulot,'Jami mahsulotlar')+
+  st(h.jami_qoldiq,'Jami qoldiq (dona)')+
+  st(pul(h.bugungi_sotuv),'Bugungi sotuv','#1e8449')+
+  st(pul(h.oylik_sotuv),'Oylik sotuv','#2471a3')+
+  st(h.qaytarilgan,'Qaytarilgan (dona)','#c0392b')+
+  st(pul(h.foyda),'Foyda','#7d3c98')+
+  '</div>'+pw;
+}
+function st(v,l,c){return '<div class="stat-card"><div class="value"'+(c?' style="color:'+c+'"':'')+'>'+v+'</div><div class="label">'+l+'</div></div>';}
+
+/* ============== OPERATSIYALAR ============== */
+let MAHS=[],KONS=[];
+async function loadRefs(){MAHS=await api('/mahsulotlar');KONS=await api('/kontragentlar');}
+async function oper(q=''){
+  await loadRefs();
+  let ops=await api('/operatsiyalar');
+  if(q){const s=q.toLowerCase();ops=ops.filter(o=>(o.nomi||'').toLowerCase().includes(s)||(o.artikul||'').toLowerCase().includes(s)||(o.kontragent||'').toLowerCase().includes(s)||(o.zakaz_nomer||'').toLowerCase().includes(s)||(o.menejer||'').toLowerCase().includes(s));}
+  document.getElementById('content').innerHTML=
+  '<div class="card"><h2>Operatsiyalar moduli'+
+  '<span><button class="btn btn-light btn-sm" onclick="exp(\'operatsiyalar\')">⬇ Excel</button> <button class="btn btn-light btn-sm" onclick="window.print()">🖨 PDF</button></span></h2>'+
+  '<div class="filter-bar"><input class="search-bar" placeholder="🔍 Tez qidiruv (artikul, mijoz, zakaz...)" oninput="oper(this.value)" value="'+esc(q)+'"><button class="btn btn-success spacer" onclick="operForm()">+ Yangi operatsiya</button></div>'+
+  '<div class="tbl-wrap"><table><tr>'+
+  ['Склад','Артикул','Наименование','Остаток','Отгр','Возвр','Продажа','Себест','Сумма продаж','Заказ №','Статус','Договор','Контрагент','Дата отгр','Дата продаж','Менеджер',''].map(h=>'<th>'+h+'</th>').join('')+'</tr>'+
+  ops.map(o=>'<tr>'+
+    '<td>'+esc(o.sklad)+'</td><td><b>'+esc(o.artikul)+'</b></td><td>'+esc(o.nomi)+'</td>'+
+    '<td>'+(o.ostatok==null?'-':o.ostatok)+'</td><td>'+o.otgr_kol+'</td><td>'+o.vozvrat_kol+'</td>'+
+    '<td><b>'+o.prodaja+'</b></td><td>'+pul(o.sebest)+'</td><td><b>'+pul(o.summa_prodaj)+'</b></td>'+
+    '<td>'+esc(o.zakaz_nomer)+'</td><td>'+badge(o.status)+'</td><td>'+esc(o.dogovor)+'</td>'+
+    '<td>'+esc(o.kontragent)+'</td><td>'+esc(o.data_otgr)+'</td><td>'+esc(o.data_prodaj)+'</td>'+
+    '<td>'+esc(o.menejer)+'</td>'+
+    '<td><button class="btn btn-info btn-sm" onclick="operForm('+o.id+')">✎</button> <button class="btn btn-danger btn-sm" onclick="operDel('+o.id+')">🗑</button></td>'+
+  '</tr>').join('')+'</table></div>'+
+  (ops.length?'':'<p class="muted" style="padding:14px">Hozircha operatsiyalar yo\'q.</p>')+'</div>';
+}
+function badge(s){const m={'Продажа':'b-prodaja','Возврат':'b-vozvrat','Отправлен':'b-otpravlen'};return '<span class="badge '+(m[s]||'b-otpravlen')+'">'+esc(s)+'</span>';}
+
+function operForm(id){
+  const o=id?window._ops_cache.find(x=>x.id===id):{};
+  const cur=o||{};
+  const mahOpt=MAHS.map(m=>'<option value="'+m.id+'" data-tannarx="'+m.tannarx+'" data-narx="'+m.sotuv_narx+'" data-ost="'+m.qoldiq+'" '+(cur.mahsulot_id===m.id?'selected':'')+'>'+esc(m.artikul||('#'+m.id))+' — '+esc(m.nomi)+' (qoldiq:'+m.qoldiq+')</option>').join('');
+  const konOpt='<option value="">--</option>'+KONS.map(k=>'<option value="'+k.id+'" data-sklad="'+esc(k.sklad)+'" data-men="'+esc(k.menejer)+'" '+(cur.kontragent_id===k.id?'selected':'')+'>'+esc(k.nomi)+'</option>').join('');
+  const statOpt=['Отправлен','Продажа','Возврат'].map(s=>'<option '+(cur.status===s?'selected':'')+'>'+s+'</option>').join('');
+  moch('<h3>'+(id?'Operatsiyani tahrirlash':'Yangi operatsiya')+'</h3>'+
+  '<div class="form-grid">'+
+  '<div class="form-group" style="grid-column:span 2"><label>Артикул / Mahsulot *</label><select id="op_m" onchange="opFill()">'+'<option value="">-- Tanlang --</option>'+mahOpt+'</select></div>'+
+  '<div class="form-group"><label>Остаток</label><input id="op_ost" disabled></div>'+
+  '<div class="form-group"><label>Наименование</label><input id="op_nom" disabled></div>'+
+  '<div class="form-group"><label>Отгр количество</label><input id="op_otgr" type="number" value="'+(cur.otgr_kol||0)+'" oninput="opCalc()"></div>'+
+  '<div class="form-group"><label>Возврат количество</label><input id="op_voz" type="number" value="'+(cur.vozvrat_kol||0)+'" oninput="opCalc()"></div>'+
+  '<div class="form-group"><label>Продажа (avto)</label><input id="op_pro" disabled></div>'+
+  '<div class="form-group"><label>Себестоимость</label><input id="op_seb" type="number" value="'+(cur.sebest||'')+'" oninput="opCalc()"></div>'+
+  '<div class="form-group"><label>Цена продажи</label><input id="op_narx" type="number" value="'+(cur.sotuv_narx||'')+'" oninput="opCalc()"></div>'+
+  '<div class="form-group"><label>Сумма продаж (avto)</label><input id="op_sum" disabled></div>'+
+  '<div class="form-group"><label>Статус</label><select id="op_stat">'+statOpt+'</select></div>'+
+  '<div class="form-group"><label>Заказ номер</label><input id="op_zak" value="'+esc(cur.zakaz_nomer)+'"></div>'+
+  '<div class="form-group"><label>Договор</label><input id="op_dog" value="'+esc(cur.dogovor)+'"></div>'+
+  '<div class="form-group"><label>Контрагент</label><select id="op_k" onchange="opKon()">'+konOpt+'</select></div>'+
+  '<div class="form-group"><label>Склад</label><input id="op_skl" value="'+esc(cur.sklad)+'"></div>'+
+  (isAdmin()?'<div class="form-group"><label>Менеджер</label><input id="op_men" value="'+esc(cur.menejer||USER.username)+'"></div>':'')+
+  '</div>'+
+  '<div class="modal-footer"><button class="btn btn-success" onclick="operSave('+(id||0)+')">Saqlash</button><button class="btn btn-light" onclick="myop()">Bekor</button></div>');
+  opFill(true);opCalc();
+}
+function opFill(keep){
+  const s=document.getElementById('op_m');const o=s.options[s.selectedIndex];
+  if(!o||!s.value){return;}
+  document.getElementById('op_ost').value=o.dataset.ost||0;
+  document.getElementById('op_nom').value=o.text.split(' — ')[1]?o.text.split(' — ')[1].split(' (qoldiq')[0]:'';
+  if(!keep){
+    document.getElementById('op_seb').value=o.dataset.tannarx||0;
+    document.getElementById('op_narx').value=o.dataset.narx||0;
+  }else{
+    if(!val('op_seb'))document.getElementById('op_seb').value=o.dataset.tannarx||0;
+    if(!val('op_narx'))document.getElementById('op_narx').value=o.dataset.narx||0;
+  }
+  opCalc();
+}
+function opKon(){
+  const s=document.getElementById('op_k');const o=s.options[s.selectedIndex];
+  if(o&&o.dataset){if(!val('op_skl'))document.getElementById('op_skl').value=o.dataset.sklad||'';
+    const men=document.getElementById('op_men');if(men&&!men.value)men.value=o.dataset.men||'';}
+}
+function opCalc(){
+  const otgr=parseInt(val('op_otgr'))||0,voz=parseInt(val('op_voz'))||0;
+  const pro=otgr-voz;const narx=parseFloat(val('op_narx'))||0;
+  document.getElementById('op_pro').value=pro;
+  document.getElementById('op_sum').value=(pro*narx).toLocaleString('uz-UZ');
+}
+async function operSave(id){
+  const mid=val('op_m');
+  if(!mid){alert('Mahsulot (artikul) tanlang!');return;}
+  const d={mahsulot_id:parseInt(mid),otgr_kol:parseInt(val('op_otgr'))||0,vozvrat_kol:parseInt(val('op_voz'))||0,
+    sebest:parseFloat(val('op_seb'))||0,sotuv_narx:parseFloat(val('op_narx'))||0,status:val('op_stat'),
+    zakaz_nomer:val('op_zak'),dogovor:val('op_dog'),kontragent_id:val('op_k')?parseInt(val('op_k')):null,
+    sklad:val('op_skl')};
+  if(isAdmin())d.menejer=val('op_men');
+  try{
+    if(id)await api('/operatsiyalar/'+id,'PUT',d);else await api('/operatsiyalar','POST',d);
+    myop();oper();
+  }catch(e){alert('Xato: '+e.message);}
+}
+async function operDel(id){
+  if(!confirm('Operatsiyani o\'chirasizmi? Ombor qoldig\'i tiklanadi.'))return;
+  await api('/operatsiyalar/'+id,'DELETE');oper();
+}
+/* cache ops for edit */
+const _origOper=oper;
+oper=async function(q=''){await _origOper(q);try{window._ops_cache=await api('/operatsiyalar');}catch(e){}};
+
+/* ============== MAHSULOTLAR ============== */
 async function mah(q=''){
-let ms=await api('/mahsulotlar');
-if(q)ms=ms.filter(m=>m.nomi.toLowerCase().includes(q.toLowerCase())||m.razmeri.toLowerCase().includes(q.toLowerCase())||(m.lot_raqami||'').toLowerCase().includes(q.toLowerCase()));
-document.getElementById('content').innerHTML='<div class="card"><h2>Mahsulotlar</h2><div class="filter-bar"><input class="search-bar" placeholder="Qidirish..." oninput="mah(this.value)" value="'+q+'"><button class="btn btn-success" onclick="mah_qosh_m()">+ Yangi Mahsulot</button></div><table><tr><th>#</th><th>Nomi</th><th>Razmeri</th><th>Lot</th><th>Tannarx</th><th>Sotuv narx</th><th>Qoldiq</th><th></th></tr>'+ms.map(m=>'<tr><td>'+m.id+'</td><td><b>'+m.nomi+'</b></td><td>'+m.razmeri+'</td><td>'+(m.lot_raqami||'-')+'</td><td>'+pul(m.tannarx)+'</td><td>'+pul(m.sotuv_narx)+'</td><td>'+(m.qoldiq<=5?'<span style="color:red;font-weight:bold">'+m.qoldiq+' !</span>':m.qoldiq)+'</td><td><button class="btn btn-info" style="padding:4px 10px;font-size:12px" onclick="mah_tahr('+m.id+')">Tahrir</button></td></tr>').join('')+'</table></div>';}
+  let ms=await api('/mahsulotlar'+(q?'?q='+encodeURIComponent(q):''));
+  const canEdit=isAdmin();
+  document.getElementById('content').innerHTML=
+  '<div class="card"><h2>Mahsulotlar bazasi <span><button class="btn btn-light btn-sm" onclick="exp(\'mahsulotlar\')">⬇ Excel</button>'+(canEdit?' <button class="btn btn-light btn-sm" onclick="impForm()">⬆ Import</button>':'')+'</span></h2>'+
+  '<div class="filter-bar"><input class="search-bar" placeholder="🔍 Qidirish (nom, artikul, kod)" oninput="mah(this.value)" value="'+esc(q)+'">'+(canEdit?'<button class="btn btn-success spacer" onclick="mahForm()">+ Yangi mahsulot</button>':'')+'</div>'+
+  '<div class="tbl-wrap"><table><tr>'+['Kod','Artikul','Nomi','Birlik','Qoldiq','Tannarx','Sotuv narx','Sotilgan','Qaytarilgan','Omborda (kun)',''].map(h=>'<th>'+h+'</th>').join('')+'</tr>'+
+  ms.map(m=>'<tr><td>'+esc(m.kod)+'</td><td><b>'+esc(m.artikul)+'</b></td><td>'+esc(m.nomi)+'</td><td>'+esc(m.birlik)+'</td>'+
+  '<td>'+(m.qoldiq<=5?'<span style="color:#c0392b;font-weight:700">'+m.qoldiq+' ⚠</span>':m.qoldiq)+'</td>'+
+  '<td>'+pul(m.tannarx)+'</td><td>'+pul(m.sotuv_narx)+'</td><td>'+m.sotilgan+'</td><td>'+m.qaytarilgan+'</td><td>'+m.omborda_kunlar+'</td>'+
+  '<td>'+(canEdit?'<button class="btn btn-info btn-sm" onclick="mahForm('+m.id+')">✎</button> <button class="btn btn-danger btn-sm" onclick="mahDel('+m.id+')">🗑</button>':'')+'</td></tr>').join('')+'</table></div></div>';
+  window._mah_cache=ms;
+}
+function mahForm(id){
+  const m=id?window._mah_cache.find(x=>x.id===id):{};const c=m||{};
+  moch('<h3>'+(id?'Mahsulotni tahrirlash':'Yangi mahsulot')+'</h3><div class="form-grid">'+
+  '<div class="form-group"><label>Kod</label><input id="m_kod" value="'+esc(c.kod)+'"></div>'+
+  '<div class="form-group"><label>Artikul</label><input id="m_art" value="'+esc(c.artikul)+'"></div>'+
+  '<div class="form-group" style="grid-column:span 2"><label>Nomi *</label><input id="m_nom" value="'+esc(c.nomi)+'"></div>'+
+  '<div class="form-group"><label>O\'lchov birligi</label><input id="m_bir" value="'+esc(c.birlik||'dona')+'"></div>'+
+  '<div class="form-group"><label>Qoldiq (mavjud soni)</label><input id="m_qol" type="number" value="'+(c.qoldiq||0)+'"></div>'+
+  '<div class="form-group"><label>Tannarx</label><input id="m_tan" type="number" value="'+(c.tannarx||0)+'"></div>'+
+  '<div class="form-group"><label>Sotuv narxi</label><input id="m_sot" type="number" value="'+(c.sotuv_narx||0)+'"></div>'+
+  '</div><div class="modal-footer"><button class="btn btn-success" onclick="mahSave('+(id||0)+')">Saqlash</button><button class="btn btn-light" onclick="myop()">Bekor</button></div>');
+}
+async function mahSave(id){
+  const d={kod:val('m_kod'),artikul:val('m_art'),nomi:val('m_nom'),birlik:val('m_bir'),
+    qoldiq:parseInt(val('m_qol'))||0,tannarx:parseFloat(val('m_tan'))||0,sotuv_narx:parseFloat(val('m_sot'))||0};
+  if(!d.nomi){alert('Nomi majburiy!');return;}
+  try{if(id)await api('/mahsulotlar/'+id,'PUT',d);else await api('/mahsulotlar','POST',d);myop();mah();}
+  catch(e){alert('Xato: '+e.message);}
+}
+async function mahDel(id){if(!confirm('Mahsulotni o\'chirasizmi?'))return;await api('/mahsulotlar/'+id,'DELETE');mah();}
+function impForm(){
+  moch('<h3>Excel/CSV import</h3><p class="muted" style="margin-bottom:10px">CSV ustunlari: kod, artikul, nomi, birlik, qoldiq, tannarx, sotuv_narx. Birinchi qator — sarlavha.</p>'+
+  '<textarea id="imp_t" rows="10" style="width:100%" placeholder="kod,artikul,nomi,birlik,qoldiq,tannarx,sotuv_narx&#10;K1,ART1,Plastina,dona,10,50000,80000"></textarea>'+
+  '<div class="modal-footer"><button class="btn btn-success" onclick="impSave()">Import qilish</button><button class="btn btn-light" onclick="myop()">Bekor</button></div>');
+}
+async function impSave(){
+  try{const r=await api('/import/mahsulotlar','POST',{csv:val('imp_t')});myop();alert(r.qoshildi+' ta mahsulot qo\'shildi');mah();}
+  catch(e){alert('Xato: '+e.message);}
+}
 
-function mah_qosh_m(){moch('<h3>Yangi Mahsulot</h3><div class="form-grid"><div class="form-group"><label>Nomi *</label><input id="mn" placeholder="Nomi"></div><div class="form-group"><label>Razmeri *</label><input id="mr" placeholder="44, L, XL"></div><div class="form-group"><label>Lot raqami</label><input id="ml" placeholder="Lot"></div><div class="form-group"><label>Tannarx</label><input id="mt" type="number" placeholder="0"></div><div class="form-group"><label>Sotuv narxi</label><input id="ms" type="number" placeholder="0"></div><div class="form-group"><label>Qoldiq</label><input id="mq" type="number" placeholder="0"></div></div><div class="form-group"><label>Izoh</label><textarea id="mi" rows="2" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:100%"></textarea></div><div class="modal-footer"><button class="btn btn-success" onclick="mah_saq()">Saqlash</button><button class="btn" style="background:#eee" onclick="myop()">Bekor</button></div>');}
-
-async function mah_saq(){
-const n=document.getElementById('mn').value.trim();
-const r=document.getElementById('mr').value.trim();
-if(!n||!r){alert('Nomi va razmeri majburiy!');return;}
-await api('/mahsulotlar','POST',{nomi:n,razmeri:r,lot_raqami:document.getElementById('ml').value,tannarx:parseFloat(document.getElementById('mt').value)||0,sotuv_narx:parseFloat(document.getElementById('ms').value)||0,qoldiq:parseInt(document.getElementById('mq').value)||0,izoh:document.getElementById('mi').value});
-myop();mah();}
-
-async function mah_tahr(id){
-const ms=await api('/mahsulotlar');
-const m=ms.find(x=>x.id===id);if(!m)return;
-moch('<h3>Mahsulotni Tahrirlash</h3><div class="form-grid"><div class="form-group"><label>Nomi *</label><input id="mn" value="'+m.nomi+'"></div><div class="form-group"><label>Razmeri *</label><input id="mr" value="'+m.razmeri+'"></div><div class="form-group"><label>Lot</label><input id="ml" value="'+(m.lot_raqami||'')+'"></div><div class="form-group"><label>Tannarx</label><input id="mt" type="number" value="'+m.tannarx+'"></div><div class="form-group"><label>Sotuv narxi</label><input id="ms" type="number" value="'+m.sotuv_narx+'"></div><div class="form-group"><label>Qoldiq</label><input id="mq" type="number" value="'+m.qoldiq+'"></div></div><div class="form-group"><label>Izoh</label><textarea id="mi" rows="2" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:100%">'+(m.izoh||'')+'</textarea></div><div class="modal-footer"><button class="btn btn-success" onclick="mah_yan('+id+')">Saqlash</button><button class="btn" style="background:#eee" onclick="myop()">Bekor</button></div>');}
-
-async function mah_yan(id){
-await api('/mahsulotlar/'+id,'PUT',{nomi:document.getElementById('mn').value,razmeri:document.getElementById('mr').value,lot_raqami:document.getElementById('ml').value,tannarx:parseFloat(document.getElementById('mt').value)||0,sotuv_narx:parseFloat(document.getElementById('ms').value)||0,qoldiq:parseInt(document.getElementById('mq').value)||0,izoh:document.getElementById('mi').value});
-myop();mah();}
-
+/* ============== KONTRAGENTLAR ============== */
 async function kon(q=''){
-let ks=await api('/kontragentlar');
-if(q)ks=ks.filter(k=>k.ismi.toLowerCase().includes(q.toLowerCase())||(k.telefon||'').includes(q));
-document.getElementById('content').innerHTML='<div class="card"><h2>Kontragentlar</h2><div class="filter-bar"><input class="search-bar" placeholder="Qidirish..." oninput="kon(this.value)" value="'+q+'"><button class="btn btn-success" onclick="kon_qosh_m()">+ Yangi</button></div><table><tr><th>#</th><th>Ismi</th><th>Telefon</th><th>Manzil</th><th>Izoh</th><th></th></tr>'+ks.map(k=>'<tr><td>'+k.id+'</td><td><b>'+k.ismi+'</b></td><td>'+(k.telefon||'-')+'</td><td>'+(k.manzil||'-')+'</td><td>'+(k.izoh||'-')+'</td><td><button class="btn btn-info" style="padding:4px 10px;font-size:12px" onclick="kon_tahr('+k.id+')">Tahrir</button></td></tr>').join('')+'</table></div>';}
+  let ks=await api('/kontragentlar');
+  if(q){const s=q.toLowerCase();ks=ks.filter(k=>(k.nomi||'').toLowerCase().includes(s)||(k.menejer||'').toLowerCase().includes(s)||(k.telefon||'').includes(q));}
+  document.getElementById('content').innerHTML=
+  '<div class="card"><h2>Kontragentlar bazasi</h2>'+
+  '<div class="filter-bar"><input class="search-bar" placeholder="🔍 Qidirish" oninput="kon(this.value)" value="'+esc(q)+'"><button class="btn btn-success spacer" onclick="konForm()">+ Yangi</button></div>'+
+  '<div class="tbl-wrap"><table><tr>'+['Nomi','Menejer','Status','Sklad','Telefon','Izoh',''].map(h=>'<th>'+h+'</th>').join('')+'</tr>'+
+  ks.map(k=>'<tr><td><b>'+esc(k.nomi)+'</b></td><td>'+esc(k.menejer)+'</td><td>'+esc(k.status)+'</td><td>'+esc(k.sklad)+'</td><td>'+esc(k.telefon)+'</td><td>'+esc(k.izoh)+'</td>'+
+  '<td><button class="btn btn-info btn-sm" onclick="konForm('+k.id+')">✎</button>'+(isAdmin()?' <button class="btn btn-danger btn-sm" onclick="konDel('+k.id+')">🗑</button>':'')+'</td></tr>').join('')+'</table></div></div>';
+  window._kon_cache=ks;
+}
+function konForm(id){
+  const k=id?window._kon_cache.find(x=>x.id===id):{};const c=k||{};
+  moch('<h3>'+(id?'Tahrirlash':'Yangi kontragent')+'</h3><div class="form-grid">'+
+  '<div class="form-group" style="grid-column:span 2"><label>Kontragent nomi *</label><input id="k_nom" value="'+esc(c.nomi)+'"></div>'+
+  '<div class="form-group"><label>Menejer</label><input id="k_men" value="'+esc(c.menejer)+'"></div>'+
+  '<div class="form-group"><label>Status</label><select id="k_stat"><option '+(c.status==='Aktiv'?'selected':'')+'>Aktiv</option><option '+(c.status==='Nofaol'?'selected':'')+'>Nofaol</option></select></div>'+
+  '<div class="form-group"><label>Sklad</label><input id="k_skl" value="'+esc(c.sklad)+'"></div>'+
+  '<div class="form-group"><label>Telefon</label><input id="k_tel" value="'+esc(c.telefon)+'"></div>'+
+  '<div class="form-group" style="grid-column:span 2"><label>Izoh</label><input id="k_izoh" value="'+esc(c.izoh)+'"></div>'+
+  '</div><div class="modal-footer"><button class="btn btn-success" onclick="konSave('+(id||0)+')">Saqlash</button><button class="btn btn-light" onclick="myop()">Bekor</button></div>');
+}
+async function konSave(id){
+  const d={nomi:val('k_nom'),menejer:val('k_men'),status:val('k_stat'),sklad:val('k_skl'),telefon:val('k_tel'),izoh:val('k_izoh')};
+  if(!d.nomi){alert('Nomi majburiy!');return;}
+  try{if(id)await api('/kontragentlar/'+id,'PUT',d);else await api('/kontragentlar','POST',d);myop();kon();}
+  catch(e){alert('Xato: '+e.message);}
+}
+async function konDel(id){if(!confirm('O\'chirasizmi?'))return;await api('/kontragentlar/'+id,'DELETE');kon();}
 
-function kon_qosh_m(){moch('<h3>Yangi Kontragent</h3><div class="form-grid"><div class="form-group"><label>Ismi *</label><input id="ki" placeholder="To'liq ismi"></div><div class="form-group"><label>Telefon</label><input id="kt" placeholder="+998 90 ..."></div><div class="form-group" style="grid-column:span 2"><label>Manzil</label><input id="km" placeholder="Shahar, ko'cha"></div></div><div class="form-group"><label>Izoh</label><textarea id="kiz" rows="2" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:100%"></textarea></div><div class="modal-footer"><button class="btn btn-success" onclick="kon_saq()">Saqlash</button><button class="btn" style="background:#eee" onclick="myop()">Bekor</button></div>');}
+/* ============== KPI ============== */
+async function kpi(){
+  const r=await api('/kpi');
+  const rows=r.menejerlar;
+  document.getElementById('content').innerHTML=
+  '<div class="card"><h2>🏆 TOP 10 Menejerlar (foyda bo\'yicha)</h2><div class="tbl-wrap"><table><tr><th>#</th><th>Menejer</th><th>Sotilgan (dona)</th><th>Sotuv summasi</th><th>Qaytarilgan</th><th>Foyda</th></tr>'+
+  r.top10.map((m,i)=>'<tr'+(i<3?' class="top-rank"':'')+'><td>'+(i+1)+'</td><td><b>'+esc(m.menejer)+'</b></td><td>'+m.sotilgan_son+'</td><td>'+pul(m.sotuv_summa)+'</td><td>'+m.qaytarilgan+'</td><td><b>'+pul(m.foyda)+'</b></td></tr>').join('')+'</table></div>'+
+  (rows.length?'':'<p class="muted" style="padding:14px">Ma\'lumot yo\'q.</p>')+'</div>';
+}
 
-async function kon_saq(){
-const i=document.getElementById('ki').value.trim();
-if(!i){alert('Ismi majburiy!');return;}
-await api('/kontragentlar','POST',{ismi:i,telefon:document.getElementById('kt').value,manzil:document.getElementById('km').value,izoh:document.getElementById('kiz').value});
-myop();kon();}
+/* ============== HISOBOTLAR ============== */
+async function hisobot(turi='sotuv'){
+  document.getElementById('content').innerHTML='<div class="card"><h2>Hisobotlar</h2>'+
+  '<div class="filter-bar">'+
+  ['sotuv','qaytarish','ombor'].map(t=>'<button class="btn '+(t===turi?'btn-primary':'btn-light')+'" onclick="hisobot(\''+t+'\')">'+({sotuv:'Sotuv hisoboti',qaytarish:'Qaytarish hisoboti',ombor:'Ombor hisoboti'}[t])+'</button>').join('')+
+  '<button class="btn btn-light spacer" onclick="window.print()">🖨 PDF</button></div><div id="hbody">Yuklanmoqda...</div></div>';
+  const data=await api('/hisobot/'+turi);
+  const b=document.getElementById('hbody');
+  if(turi==='ombor'){
+    b.innerHTML='<div class="tbl-wrap"><table><tr><th>Artikul</th><th>Nomi</th><th>Qoldiq</th><th>Tannarx</th><th>Sotuv narx</th><th>Sotilgan</th><th>Qaytarilgan</th><th>Ombor qiymati</th></tr>'+
+    data.map(m=>'<tr><td>'+esc(m.artikul)+'</td><td>'+esc(m.nomi)+'</td><td>'+m.qoldiq+'</td><td>'+pul(m.tannarx)+'</td><td>'+pul(m.sotuv_narx)+'</td><td>'+m.sotilgan+'</td><td>'+m.qaytarilgan+'</td><td>'+pul(m.qoldiq*m.tannarx)+'</td></tr>').join('')+'</table></div>';
+  }else{
+    b.innerHTML='<div class="tbl-wrap"><table><tr><th>Artikul</th><th>Nomi</th><th>Mijoz</th><th>Продажа</th><th>Возврат</th><th>Сумма</th><th>Статус</th><th>Sana</th><th>Menejer</th></tr>'+
+    data.map(o=>'<tr><td>'+esc(o.artikul)+'</td><td>'+esc(o.nomi)+'</td><td>'+esc(o.kontragent)+'</td><td>'+o.prodaja+'</td><td>'+o.vozvrat_kol+'</td><td>'+pul(o.summa_prodaj)+'</td><td>'+badge(o.status)+'</td><td>'+esc(o.data_prodaj||o.data_otgr)+'</td><td>'+esc(o.menejer)+'</td></tr>').join('')+'</table></div>'+
+    (data.length?'':'<p class="muted" style="padding:14px">Ma\'lumot yo\'q.</p>');
+  }
+}
 
-async function kon_tahr(id){
-const ks=await api('/kontragentlar');
-const k=ks.find(x=>x.id===id);if(!k)return;
-moch('<h3>Kontragentni Tahrirlash</h3><div class="form-grid"><div class="form-group"><label>Ismi *</label><input id="ki" value="'+k.ismi+'"></div><div class="form-group"><label>Telefon</label><input id="kt" value="'+(k.telefon||'')+'"></div><div class="form-group" style="grid-column:span 2"><label>Manzil</label><input id="km" value="'+(k.manzil||'')+'"></div></div><div class="form-group"><label>Izoh</label><textarea id="kiz" rows="2" style="padding:8px;border:1px solid #ddd;border-radius:6px;width:100%">'+(k.izoh||'')+'</textarea></div><div class="modal-footer"><button class="btn btn-success" onclick="kon_yan('+id+')">Saqlash</button><button class="btn" style="background:#eee" onclick="myop()">Bekor</button></div>');}
+/* ============== FOYDALANUVCHILAR ============== */
+async function users(){
+  const us=await api('/users');
+  document.getElementById('content').innerHTML=
+  '<div class="card"><h2>Foydalanuvchilar</h2><div class="filter-bar"><button class="btn btn-success spacer" onclick="userForm()">+ Yangi foydalanuvchi</button></div>'+
+  '<div class="tbl-wrap"><table><tr><th>#</th><th>Login</th><th>F.I.O</th><th>Rol</th><th>Yaratilgan</th><th></th></tr>'+
+  us.map(u=>'<tr><td>'+u.id+'</td><td><b>'+esc(u.username)+'</b></td><td>'+esc(u.full_name)+'</td><td>'+(u.role==='admin'?'Admin':'Menejer')+'</td><td>'+esc(u.created_at)+'</td>'+
+  '<td>'+(u.id!==USER.id?'<button class="btn btn-danger btn-sm" onclick="userDel('+u.id+')">🗑</button>':'<span class="muted">siz</span>')+'</td></tr>').join('')+'</table></div></div>';
+}
+function userForm(){
+  moch('<h3>Yangi foydalanuvchi</h3><div class="form-grid">'+
+  '<div class="form-group"><label>Login *</label><input id="u_un"></div>'+
+  '<div class="form-group"><label>Parol *</label><input id="u_pw" type="text"></div>'+
+  '<div class="form-group"><label>F.I.O</label><input id="u_fn"></div>'+
+  '<div class="form-group"><label>Rol</label><select id="u_role"><option value="menejer">Menejer</option><option value="admin">Admin</option></select></div>'+
+  '</div><div class="modal-footer"><button class="btn btn-success" onclick="userSave()">Saqlash</button><button class="btn btn-light" onclick="myop()">Bekor</button></div>');
+}
+async function userSave(){
+  const d={username:val('u_un'),password:val('u_pw'),full_name:val('u_fn'),role:val('u_role')};
+  if(!d.username||!d.password){alert('Login va parol majburiy!');return;}
+  try{await api('/users','POST',d);myop();users();}catch(e){alert('Xato: '+e.message);}
+}
+async function userDel(id){if(!confirm('O\'chirasizmi?'))return;await api('/users/'+id,'DELETE');users();}
 
-async function kon_yan(id){
-await api('/kontragentlar/'+id,'PUT',{ismi:document.getElementById('ki').value,telefon:document.getElementById('kt').value,manzil:document.getElementById('km').value,izoh:document.getElementById('kiz').value});
-myop();kon();}
+/* ============== AUDIT ============== */
+async function audit(){
+  const a=await api('/audit');
+  document.getElementById('content').innerHTML=
+  '<div class="card"><h2>Audit log (o\'zgarishlar tarixi)</h2><div class="tbl-wrap"><table><tr><th>#</th><th>Foydalanuvchi</th><th>Amal</th><th>Obyekt</th><th>ID</th><th>Tafsilot</th><th>Sana</th></tr>'+
+  a.map(x=>'<tr><td>'+x.id+'</td><td>'+esc(x.username)+'</td><td>'+esc(x.amal)+'</td><td>'+esc(x.obyekt)+'</td><td>'+(x.obyekt_id||'')+'</td><td>'+esc(x.tafsilot)+'</td><td>'+esc(x.sana)+'</td></tr>').join('')+'</table></div></div>';
+}
 
-async function kir(){
-const ms=await api('/mahsulotlar');
-const ks=await api('/kirimlar');
-document.getElementById('content').innerHTML='<div class="card"><h2>Skladga Kirim</h2><div class="form-grid"><div class="form-group"><label>Mahsulot *</label><select id="km" onchange="knar()"><option value="">-- Tanlang --</option>'+ms.map(m=>'<option value="'+m.id+'" data-narx="'+m.tannarx+'">'+m.nomi+' - '+m.razmeri+' (qoldiq: '+m.qoldiq+')</option>').join('')+'</select></div><div class="form-group"><label>Miqdor *</label><input id="kmi" type="number" placeholder="0" min="1"></div><div class="form-group"><label>Tannarx (so'm)</label><input id="ktn" type="number" placeholder="0"></div><div class="form-group"><label>Izoh</label><input id="kiz" placeholder="Ixtiyoriy"></div></div><button class="btn btn-success" onclick="kir_saq()">Kirdi deb belgilash</button></div><div class="card"><h2>Kirimlar Tarixi</h2><table><tr><th>#</th><th>Mahsulot</th><th>Razmer</th><th>Miqdor</th><th>Tannarx</th><th>Sana</th><th>Izoh</th></tr>'+ks.map(k=>'<tr><td>'+k.id+'</td><td><b>'+k.nomi+'</b></td><td>'+k.razmeri+'</td><td><b>'+k.miqdor+'</b></td><td>'+pul(k.tannarx)+'</td><td>'+k.sana+'</td><td>'+(k.izoh||'-')+'</td></tr>').join('')+'</table></div>';}
+/* ============== EXPORT ============== */
+async function exp(turi){
+  const r=await fetch(API+'/export/'+turi,{headers:{'Authorization':'Bearer '+TOKEN}});
+  const blob=await r.blob();const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download=turi+'.csv';a.click();URL.revokeObjectURL(url);
+}
 
-function knar(){const o=document.getElementById('km').options[document.getElementById('km').selectedIndex];document.getElementById('ktn').value=o.dataset.narx||0;}
-
-async function kir_saq(){
-const mid=document.getElementById('km').value;
-const miq=parseInt(document.getElementById('kmi').value);
-if(!mid||!miq){alert('Mahsulot va miqdorni kiriting!');return;}
-await api('/kirim','POST',{mahsulot_id:parseInt(mid),miqdor:miq,tannarx:parseFloat(document.getElementById('ktn').value)||0,izoh:document.getElementById('kiz').value});
-alert('Kirim qoshildi!');kir();}
-
-async function zak(hf=''){
-const url=hf?'/zakazlar?holat='+hf:'/zakazlar';
-const zs=await api(url);
-document.getElementById('content').innerHTML='<div class="card"><h2>Zakazlar</h2><div class="filter-bar"><button class="btn '+(hf===''?'btn-primary':'btn-info')+'" onclick="zak('')">Barchasi</button><button class="btn '+(hf==='Jarayonda'?'btn-primary':'btn-warning')+'" onclick="zak('Jarayonda')">Jarayonda</button><button class="btn '+(hf==='Sotildi'?'btn-primary':'btn-success')+'" onclick="zak('Sotildi')">Sotildi</button><button class="btn btn-success" onclick="yangi_zak()" style="margin-left:auto">+ Yangi Zakaz</button></div><table><tr><th>#</th><th>Mijoz</th><th>Telefon</th><th>Sana</th><th>To'lov</th><th>Med nalog</th><th>Holat</th><th></th></tr>'+zs.map(z=>'<tr><td>'+z.id+'</td><td><b>'+z.ismi+'</b></td><td>'+(z.telefon||'-')+'</td><td>'+z.sana+'</td><td>'+pul(z.tolov)+'</td><td>'+pul(z.med_nalog)+'</td><td><span class="badge badge-'+z.holat.toLowerCase()+'">'+z.holat+'</span></td><td><button class="btn btn-info" style="padding:4px 10px;font-size:12px" onclick="zd('+z.id+')">Ko'rish</button></td></tr>').join('')+'</table></div>';}
-
-async function yangi_zak(){
-const ks=await api('/kontragentlar');
-const ms=await api('/mahsulotlar');
-window._zt=[];
-moch('<h3>Yangi Zakaz</h3><div class="form-grid"><div class="form-group"><label>Kontragent *</label><select id="zk"><option value="">-- Tanlang --</option>'+ks.map(k=>'<option value="'+k.id+'">'+k.ismi+(k.telefon?' ('+k.telefon+')':'')+'</option>').join('')+'</select></div><div class="form-group"><label>To'lov (so'm)</label><input id="zt" type="number" placeholder="0"></div><div class="form-group"><label>Med nalog</label><input id="zn" type="number" placeholder="0"></div><div class="form-group"><label>Izoh</label><input id="zi" placeholder="Ixtiyoriy"></div></div><div style="margin:15px 0"><b>Chiqariladigan Tovarlar:</b></div><div id="ztl"></div><div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap"><select id="zm" onchange="znr()" style="flex:2;padding:8px;border:1px solid #ddd;border-radius:6px"><option value="">-- Mahsulot --</option>'+ms.filter(m=>m.qoldiq>0).map(m=>'<option value="'+m.id+'" data-narx="'+m.sotuv_narx+'">'+m.nomi+' - '+m.razmeri+' ('+m.qoldiq+')</option>').join('')+'</select><input id="zmq" type="number" value="1" min="1" style="width:70px;padding:8px;border:1px solid #ddd;border-radius:6px"><input id="znx" type="number" placeholder="Narx" style="width:130px;padding:8px;border:1px solid #ddd;border-radius:6px"><button class="btn btn-success" onclick="ztq()">+</button></div><div class="modal-footer"><button class="btn btn-success" onclick="zsaq()">Zakazni Ochish</button><button class="btn" style="background:#eee" onclick="myop()">Bekor</button></div>');}
-
-function znr(){const o=document.getElementById('zm').options[document.getElementById('zm').selectedIndex];document.getElementById('znx').value=o.dataset.narx||0;}
-function ztq(){
-const s=document.getElementById('zm');
-const mid=s.value;
-const mt=s.options[s.selectedIndex].text;
-const mq=parseInt(document.getElementById('zmq').value)||1;
-const nx=parseFloat(document.getElementById('znx').value)||0;
-if(!mid){alert('Mahsulot tanlang!');return;}
-window._zt.push({mahsulot_id:parseInt(mid),miqdor:mq,sotuv_narx:nx,text:mt});
-document.getElementById('ztl').innerHTML=window._zt.map((t,i)=>'<div style="background:#f8f9fa;padding:8px;border-radius:6px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center"><span>'+t.text+' x '+t.miqdor+' - '+pul(t.sotuv_narx)+'</span><button class="btn btn-danger" style="padding:2px 8px;font-size:12px" onclick="zto('+i+')">x</button></div>').join('');}
-
-function zto(i){window._zt.splice(i,1);document.getElementById('ztl').innerHTML=window._zt.map((t,j)=>'<div style="background:#f8f9fa;padding:8px;border-radius:6px;margin-bottom:5px;display:flex;justify-content:space-between;align-items:center"><span>'+t.text+' x '+t.miqdor+' - '+pul(t.sotuv_narx)+'</span><button class="btn btn-danger" style="padding:2px 8px;font-size:12px" onclick="zto('+j+')">x</button></div>').join('');}
-
-async function zsaq(){
-const kid=document.getElementById('zk').value;
-if(!kid){alert('Kontragent tanlang!');return;}
-if(!window._zt.length){alert('Kamida 1 ta tovar qoshing!');return;}
-const r=await api('/zakazlar','POST',{kontragent_id:parseInt(kid),tolov:parseFloat(document.getElementById('zt').value)||0,med_nalog:parseFloat(document.getElementById('zn').value)||0,izoh:document.getElementById('zi').value,tovarlar:window._zt});
-myop();alert('Zakaz #'+r.zakaz_id+' ochildi!');zak();}
-
-async function zd(id){
-const r=await api('/zakazlar/'+id);
-const z=r.zakaz;const ts=r.tovarlar;
-moch('<h3>Zakaz #'+id+'</h3><div style="background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:15px"><table style="width:auto"><tr><td style="padding:4px 10px;font-weight:bold">Mijoz:</td><td>'+z.ismi+'</td><td style="padding:4px 10px;font-weight:bold">Telefon:</td><td>'+(z.telefon||'-')+'</td></tr><tr><td style="padding:4px 10px;font-weight:bold">Sana:</td><td>'+z.sana+'</td><td style="padding:4px 10px;font-weight:bold">Holat:</td><td><span class="badge badge-'+z.holat.toLowerCase()+'">'+z.holat+'</span></td></tr><tr><td style="padding:4px 10px;font-weight:bold">Tolov:</td><td>'+pul(z.tolov)+'</td><td style="padding:4px 10px;font-weight:bold">Med nalog:</td><td>'+pul(z.med_nalog)+'</td></tr></table></div><b>Tovarlar:</b><table style="margin-top:10px"><tr><th>#</th><th>Mahsulot</th><th>Razmer</th><th>Lot</th><th>Miqdor</th><th>Narx</th><th>Holat</th><th>Amal</th></tr>'+ts.map(t=>'<tr><td>'+t.id+'</td><td>'+t.nomi+'</td><td>'+t.razmeri+'</td><td>'+(t.lot_raqami||'-')+'</td><td>'+t.miqdor+'</td><td>'+pul(t.sotuv_narx)+'</td><td><span class="badge badge-'+t.holat.toLowerCase()+'">'+t.holat+'</span></td><td>'+(t.holat==='Chiqarilgan'?'<button class="btn btn-warning" style="padding:3px 8px;font-size:11px" onclick="tvoz('+t.id+','+id+')">Vozvrat</button> <button class="btn btn-success" style="padding:3px 8px;font-size:11px" onclick="tsot('+t.id+','+id+','+t.sotuv_narx+')">Sotildi</button>':'')+'</td></tr>').join('')+'</table><div class="modal-footer"><button class="btn btn-purple" onclick="tol_yan('+id+','+z.tolov+','+z.med_nalog+')">Tolov Yangilash</button><button class="btn" style="background:#eee" onclick="myop()">Yopish</button></div>');}
-
-async function tvoz(tid,zid){
-if(!confirm('Bu tovarni qaytarildi deb belgilash?'))return;
-await api('/zakaz_tovar/'+tid+'/vozvrat','PUT',{});
-myop();zd(zid);}
-
-async function tsot(tid,zid,narx){
-const yn=prompt('Sotuv narxini kiriting (so'm):',narx);
-if(yn===null)return;
-await api('/zakaz_tovar/'+tid+'/sotildi','PUT',{sotuv_narx:parseFloat(yn)||narx});
-myop();zd(zid);}
-
-function tol_yan(zid,t,m){
-moch('<h3>Tolov Yangilash - Zakaz #'+zid+'</h3><div class="form-grid"><div class="form-group"><label>Tolов (so'm)</label><input id="tlt" type="number" value="'+t+'"></div><div class="form-group"><label>Med nalog</label><input id="tlm" type="number" value="'+m+'"></div></div><div class="modal-footer"><button class="btn btn-success" onclick="tol_saq('+zid+')">Saqlash</button><button class="btn" style="background:#eee" onclick="myop()">Bekor</button></div>');}
-
-async function tol_saq(zid){
-await api('/zakazlar/'+zid+'/tolov','PUT',{tolov:parseFloat(document.getElementById('tlt').value)||0,med_nalog:parseFloat(document.getElementById('tlm').value)||0});
-myop();zd(zid);}
-
-async function hiso(){
-const h=await api('/hisobot');
-document.getElementById('content').innerHTML='<div class="card"><h2>Hisobot</h2><div class="stats"><div class="stat-card"><div class="value">'+h.jami_zakaz+'</div><div class="label">Jami zakazlar</div></div><div class="stat-card"><div class="value" style="color:#d35400">'+h.jarayonda+'</div><div class="label">Jarayondagi</div></div><div class="stat-card"><div class="value" style="color:#1e8449">'+h.sotildi+'</div><div class="label">Sotilganlar</div></div><div class="stat-card"><div class="value" style="color:#c0392b">'+h.vozvrat_son+'</div><div class="label">Vozvratlar</div></div><div class="stat-card"><div class="value" style="color:#7d3c98">'+pul(h.jami_tolov)+'</div><div class="label">Jami tushum</div></div><div class="stat-card"><div class="value" style="color:#c0392b">'+pul(h.jami_nalog)+'</div><div class="label">Med nalog</div></div><div class="stat-card"><div class="value" style="color:#1e8449">'+pul(h.sof_daromad)+'</div><div class="label">Sof daromad</div></div></div></div>'+(h.past_qoldiq.length?'<div class="card"><h2>Kam Qoldiq</h2><table><tr><th>Mahsulot</th><th>Razmer</th><th>Qoldiq</th></tr>'+h.past_qoldiq.map(p=>'<tr><td>'+p.nomi+'</td><td>'+p.razmeri+'</td><td style="color:red;font-weight:bold">'+p.qoldiq+'</td></tr>').join('')+'</table></div>':'');}
-
-bosh();
+/* ---------- boot ---------- */
+if(TOKEN&&USER){startApp();}
 </script>
 </body>
 </html>
