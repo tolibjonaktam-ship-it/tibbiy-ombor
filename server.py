@@ -23,6 +23,12 @@ import io
 from datetime import datetime, date
 from functools import wraps
 
+try:
+    from openpyxl import Workbook
+    HAS_XLSX = True
+except ImportError:
+    HAS_XLSX = False
+
 app = Flask(__name__)
 CORS(app)
 
@@ -758,6 +764,145 @@ def import_mahsulotlar():
     conn.close()
     audit(request.user['username'], 'import', 'mahsulot', None, f'{n} ta')
     return jsonify({'status': 'ok', 'qoshildi': n})
+
+
+# ----------------------------------------------------------------------------
+# Haqiqiy Excel (.xlsx) export
+# ----------------------------------------------------------------------------
+def xlsx_response(sheet_name, headers, rows, filename):
+    wb = Workbook()
+    ws = wb.active
+    ws.title = sheet_name
+    ws.append(headers)
+    for r in rows:
+        ws.append(r)
+    # ustun kengligi
+    for i, h in enumerate(headers, 1):
+        ws.column_dimensions[chr(64 + i) if i <= 26 else 'A'].width = max(12, len(str(h)) + 2)
+    buf = io.BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+    return Response(
+        buf.read(),
+        mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        headers={'Content-Disposition': f'attachment; filename={filename}'})
+
+
+@app.route('/api/xlsx/mahsulotlar', methods=['GET'])
+@login_required()
+def xlsx_mahsulotlar():
+    if not HAS_XLSX:
+        return jsonify({'error': 'openpyxl o\'rnatilmagan'}), 501
+    conn = get_db()
+    rows = conn.execute("SELECT * FROM mahsulotlar ORDER BY nomi").fetchall()
+    conn.close()
+    headers = ['Kod', 'Artikul', 'Nomi', 'Birlik', 'Qoldiq', 'Tannarx',
+               'Sotuv narx', 'Sotilgan', 'Qaytarilgan']
+    data = [[r['kod'], r['artikul'], r['nomi'], r['birlik'], r['qoldiq'],
+             r['tannarx'], r['sotuv_narx'], r['sotilgan'], r['qaytarilgan']] for r in rows]
+    return xlsx_response('Mahsulotlar', headers, data, 'mahsulotlar.xlsx')
+
+
+@app.route('/api/xlsx/operatsiyalar', methods=['GET'])
+@login_required()
+def xlsx_operatsiyalar():
+    if not HAS_XLSX:
+        return jsonify({'error': 'openpyxl o\'rnatilmagan'}), 501
+    u = request.user
+    conn = get_db()
+    where, params = '', []
+    if u['role'] != 'admin':
+        where = "WHERE o.menejer=? "
+        params.append(u['username'])
+    sql, _ = op_query(where + "ORDER BY o.id DESC")
+    rows = conn.execute(sql, params).fetchall()
+    conn.close()
+    headers = ['Sklad', 'Artikul', 'Nomi', 'Ostatok', 'Otgr', 'Vozvrat', 'Prodaja',
+               'Sebest', 'Summa prodaj', 'Zakaz №', 'Status', 'Dogovor', 'Kontragent',
+               'Data otgr', 'Data prodaj', 'Menejer']
+    keys = ['sklad', 'artikul', 'nomi', 'ostatok', 'otgr_kol', 'vozvrat_kol', 'prodaja',
+            'sebest', 'summa_prodaj', 'zakaz_nomer', 'status', 'dogovor', 'kontragent',
+            'data_otgr', 'data_prodaj', 'menejer']
+    data = [[r[k] if k in r.keys() else '' for k in keys] for r in rows]
+    return xlsx_response('Operatsiyalar', headers, data, 'operatsiyalar.xlsx')
+
+
+# ----------------------------------------------------------------------------
+# Parol o'zgartirish
+# ----------------------------------------------------------------------------
+@app.route('/api/change-password', methods=['POST'])
+@login_required()
+def change_password():
+    d = request.json or {}
+    if len(d.get('new', '')) < 4:
+        return jsonify({'error': 'Yangi parol kamida 4 belgidan iborat bo\'lsin'}), 400
+    conn = get_db()
+    u = conn.execute("SELECT * FROM users WHERE id=?", (request.user['id'],)).fetchone()
+    if not verify_password(d.get('old', ''), u['password_hash']):
+        conn.close()
+        return jsonify({'error': 'Joriy parol noto\'g\'ri'}), 400
+    conn.execute("UPDATE users SET password_hash=? WHERE id=?",
+                 (hash_password(d['new']), request.user['id']))
+    conn.commit()
+    conn.close()
+    audit(request.user['username'], 'parol_ozgartirdi', 'foydalanuvchi', request.user['id'])
+    return jsonify({'status': 'ok'})
+
+
+@app.route('/api/users/<int:uid>/password', methods=['PUT'])
+@login_required('admin')
+def admin_reset_password(uid):
+    d = request.json or {}
+    if len(d.get('new', '')) < 4:
+        return jsonify({'error': 'Parol kamida 4 belgidan iborat bo\'lsin'}), 400
+    conn = get_db()
+    conn.execute("UPDATE users SET password_hash=? WHERE id=?", (hash_password(d['new']), uid))
+    conn.commit()
+    conn.close()
+    audit(request.user['username'], 'parol_tikladi', 'foydalanuvchi', uid)
+    return jsonify({'status': 'ok'})
+
+
+# ----------------------------------------------------------------------------
+# Grafiklar uchun ma'lumot (oxirgi 6 oy sotuvi + menejerlar)
+# ----------------------------------------------------------------------------
+@app.route('/api/charts', methods=['GET'])
+@login_required()
+def charts():
+    conn = get_db()
+    u = request.user
+    where, params = '', []
+    if u['role'] != 'admin':
+        where = "AND menejer=? "
+        params.append(u['username'])
+
+    # oxirgi 6 oy
+    months = []
+    y, m = date.today().year, date.today().month
+    for _ in range(6):
+        months.append(f"{y:04d}-{m:02d}")
+        m -= 1
+        if m == 0:
+            m = 12
+            y -= 1
+    months.reverse()
+
+    seriya = []
+    for mo in months:
+        r = conn.execute(
+            f"SELECT COALESCE(SUM(summa_prodaj),0) s FROM operatsiyalar "
+            f"WHERE substr(data_prodaj,1,7)=? {where}", [mo] + params).fetchone()
+        seriya.append({'oy': mo, 'summa': r['s'] or 0})
+
+    # status taqsimoti
+    statlar = conn.execute(
+        f"SELECT status, COUNT(*) n FROM operatsiyalar WHERE 1=1 {where} GROUP BY status",
+        params).fetchall()
+    conn.close()
+    return jsonify({
+        'oylik': seriya,
+        'statuslar': [dict(s) for s in statlar],
+    })
 
 
 # ----------------------------------------------------------------------------

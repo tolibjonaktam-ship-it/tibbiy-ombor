@@ -60,6 +60,16 @@ tr:hover{background:#f6f9fc}
 .err{color:#c0392b;font-size:13px;margin-top:10px;text-align:center;min-height:18px}
 .muted{color:#8a96a3;font-size:12px}
 .top-rank{background:#fef9e7;font-weight:700}
+.charts{display:grid;grid-template-columns:2fr 1fr;gap:18px}
+@media(max-width:900px){.charts{grid-template-columns:1fr}}
+.bars{display:flex;align-items:flex-end;gap:14px;height:200px;padding:10px 4px;border-bottom:2px solid #e0e6ee}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px}
+.bar{width:70%;max-width:48px;background:linear-gradient(180deg,#2471a3,#0f3d5e);border-radius:5px 5px 0 0;min-height:3px;transition:.3s;position:relative}
+.bar:hover{opacity:.85}
+.bar-val{font-size:11px;color:#0f3d5e;font-weight:700}
+.bar-lbl{font-size:11px;color:#6b7785;margin-top:6px}
+.donut-row{display:flex;align-items:center;gap:10px;margin-bottom:9px;font-size:13px}
+.dot{width:13px;height:13px;border-radius:50%;flex-shrink:0}
 @media print{.header,.nav,.filter-bar,.btn{display:none!important}.card{box-shadow:none}}
 </style>
 </head>
@@ -85,6 +95,7 @@ tr:hover{background:#f6f9fc}
     <div class="right">
       <span id="clock"></span>
       <span>👤 <b id="hdrUser"></b> <span id="hdrRole" class="muted"></span></span>
+      <button class="logout" style="background:#15517a" onclick="pwForm()">Parol</button>
       <button class="logout" onclick="logout()">Chiqish</button>
     </div>
   </div>
@@ -175,6 +186,8 @@ async function dash(){
     pw='<div class="card"><h2>⚠️ Kam qoldiq (5 va undan kam)</h2><div class="tbl-wrap"><table><tr><th>Artikul</th><th>Nomi</th><th>Birlik</th><th>Qoldiq</th></tr>'+
     h.past_qoldiq.map(p=>'<tr><td>'+esc(p.artikul)+'</td><td>'+esc(p.nomi)+'</td><td>'+esc(p.birlik)+'</td><td style="color:#c0392b;font-weight:700">'+p.qoldiq+'</td></tr>').join('')+'</table></div></div>';
   }
+  let charts='';
+  try{charts=await dashCharts();}catch(e){}
   document.getElementById('content').innerHTML=
   '<div class="stats">'+
   st(h.jami_mahsulot,'Jami mahsulotlar')+
@@ -183,7 +196,23 @@ async function dash(){
   st(pul(h.oylik_sotuv),'Oylik sotuv','#2471a3')+
   st(h.qaytarilgan,'Qaytarilgan (dona)','#c0392b')+
   st(pul(h.foyda),'Foyda','#7d3c98')+
-  '</div>'+pw;
+  '</div>'+charts+pw;
+}
+async function dashCharts(){
+  const c=await api('/charts');
+  const max=Math.max(1,...c.oylik.map(o=>o.summa));
+  const bars=c.oylik.map(o=>{
+    const hpc=Math.round(o.summa/max*100);
+    const lbl=o.oy.slice(5)+'.'+o.oy.slice(2,4);
+    return '<div class="bar-col"><div class="bar-val">'+(o.summa?(o.summa/1000000>=1?(o.summa/1000000).toFixed(1)+'M':Math.round(o.summa/1000)+'k'):'')+'</div><div class="bar" style="height:'+hpc+'%" title="'+pul(o.summa)+'"></div><div class="bar-lbl">'+lbl+'</div></div>';
+  }).join('');
+  const colors={'Продажа':'#1e8449','Возврат':'#c0392b','Отправлен':'#2471a3'};
+  const totS=c.statuslar.reduce((a,s)=>a+s.n,0)||1;
+  const legend=c.statuslar.length?c.statuslar.map(s=>'<div class="donut-row"><span class="dot" style="background:'+(colors[s.status]||'#888')+'"></span><span>'+esc(s.status)+'</span><b style="margin-left:auto">'+s.n+' ('+Math.round(s.n/totS*100)+'%)</b></div>').join(''):'<p class="muted">Ma\'lumot yo\'q</p>';
+  return '<div class="charts">'+
+    '<div class="card"><h2>📊 Oylik sotuv (oxirgi 6 oy)</h2><div class="bars">'+bars+'</div></div>'+
+    '<div class="card"><h2>🥧 Operatsiyalar statusi</h2>'+legend+'</div>'+
+    '</div>';
 }
 function st(v,l,c){return '<div class="stat-card"><div class="value"'+(c?' style="color:'+c+'"':'')+'>'+v+'</div><div class="label">'+l+'</div></div>';}
 
@@ -396,7 +425,13 @@ async function users(){
   '<div class="card"><h2>Foydalanuvchilar</h2><div class="filter-bar"><button class="btn btn-success spacer" onclick="userForm()">+ Yangi foydalanuvchi</button></div>'+
   '<div class="tbl-wrap"><table><tr><th>#</th><th>Login</th><th>F.I.O</th><th>Rol</th><th>Yaratilgan</th><th></th></tr>'+
   us.map(u=>'<tr><td>'+u.id+'</td><td><b>'+esc(u.username)+'</b></td><td>'+esc(u.full_name)+'</td><td>'+(u.role==='admin'?'Admin':'Menejer')+'</td><td>'+esc(u.created_at)+'</td>'+
-  '<td>'+(u.id!==USER.id?'<button class="btn btn-danger btn-sm" onclick="userDel('+u.id+')">🗑</button>':'<span class="muted">siz</span>')+'</td></tr>').join('')+'</table></div></div>';
+  '<td><button class="btn btn-warning btn-sm" onclick="pwReset('+u.id+',\''+esc(u.username)+'\')">🔑</button>'+(u.id!==USER.id?' <button class="btn btn-danger btn-sm" onclick="userDel('+u.id+')">🗑</button>':' <span class="muted">siz</span>')+'</td></tr>').join('')+'</table></div></div>';
+}
+async function pwReset(id,uname){
+  const np=prompt('"'+uname+'" uchun yangi parol (kamida 4 belgi):');
+  if(np===null)return;
+  try{await api('/users/'+id+'/password','PUT',{new:np});alert('Parol yangilandi');}
+  catch(e){alert('Xato: '+e.message);}
 }
 function userForm(){
   moch('<h3>Yangi foydalanuvchi</h3><div class="form-grid">'+
@@ -422,10 +457,27 @@ async function audit(){
 }
 
 /* ============== EXPORT ============== */
-async function exp(turi){
-  const r=await fetch(API+'/export/'+turi,{headers:{'Authorization':'Bearer '+TOKEN}});
+async function exp(turi,fmt){
+  fmt=fmt||'xlsx';
+  const path=fmt==='xlsx'?'/xlsx/':'/export/';
+  const r=await fetch(API+path+turi,{headers:{'Authorization':'Bearer '+TOKEN}});
+  if(!r.ok){alert('Export xatosi');return;}
   const blob=await r.blob();const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');a.href=url;a.download=turi+'.csv';a.click();URL.revokeObjectURL(url);
+  const a=document.createElement('a');a.href=url;a.download=turi+'.'+fmt;a.click();URL.revokeObjectURL(url);
+}
+
+/* ============== PAROL O'ZGARTIRISH ============== */
+function pwForm(){
+  moch('<h3>Parolni o\'zgartirish</h3><div class="form-grid">'+
+  '<div class="form-group" style="grid-column:span 2"><label>Joriy parol</label><input id="pw_old" type="password"></div>'+
+  '<div class="form-group"><label>Yangi parol</label><input id="pw_new" type="password"></div>'+
+  '<div class="form-group"><label>Takrorlang</label><input id="pw_new2" type="password"></div>'+
+  '</div><div class="modal-footer"><button class="btn btn-success" onclick="pwSave()">Saqlash</button><button class="btn btn-light" onclick="myop()">Bekor</button></div>');
+}
+async function pwSave(){
+  if(val('pw_new')!==val('pw_new2')){alert('Yangi parollar mos kelmadi!');return;}
+  try{await api('/change-password','POST',{old:val('pw_old'),new:val('pw_new')});myop();alert('Parol o\'zgartirildi');}
+  catch(e){alert('Xato: '+e.message);}
 }
 
 /* ---------- boot ---------- */
