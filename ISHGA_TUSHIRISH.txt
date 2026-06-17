@@ -1,0 +1,34 @@
+==========================================
+   MedStock ERP - ISHGA TUSHIRISH (Windows)
+==========================================
+
+ENG OSON YO'L (2 marta bosish):
+
+1. Bu papkadagi  START.bat  faylini toping.
+2. Uning ustiga 2 marta bosing (double-click).
+3. Qora oyna ochiladi, biroz kutadi va o'zi
+   brauzerni ochadi: http://localhost:5000
+4. Login: admin    Parol: admin123
+
+MUHIM:
+- Qora oynani YOPMANG. Dastur shu oyna orqali
+  ishlaydi. Yopsangiz - sayt ham o'chadi.
+- Keyingi safar ishlatish uchun yana START.bat
+  ni 2 marta bosasiz.
+
+------------------------------------------
+
+AGAR ISHLAMASA:
+
+- "Python topilmadi" desa:
+  https://www.python.org/downloads/ dan Python
+  o'rnating. O'rnatishda pastdagi
+  "Add Python to PATH" katagiga BELGI qo'ying.
+
+- Boshqa xatolik chiqsa: ekran rasmini oling va
+  yuboring - yordam beriladi.
+
+------------------------------------------
+
+MAC yoki LINUX uchun:
+  Terminalda:  bash start.sh
