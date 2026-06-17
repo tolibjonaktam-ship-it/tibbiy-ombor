@@ -94,6 +94,22 @@ def init_db():
         izoh TEXT DEFAULT ''
     )''')
 
+    # Skladlar (omborlar)
+    c.execute('''CREATE TABLE IF NOT EXISTS skladlar (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nomi TEXT NOT NULL,
+        manzil TEXT DEFAULT '',
+        izoh TEXT DEFAULT ''
+    )''')
+
+    # Menejerlar (ro'yxat — dropdownlar uchun)
+    c.execute('''CREATE TABLE IF NOT EXISTS menejerlar (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        ism TEXT NOT NULL,
+        telefon TEXT DEFAULT '',
+        izoh TEXT DEFAULT ''
+    )''')
+
     # Operatsiyalar moduli
     c.execute('''CREATE TABLE IF NOT EXISTS operatsiyalar (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -411,6 +427,110 @@ def kontragent_ochir(kid):
     conn.commit()
     conn.close()
     audit(request.user['username'], 'ochirdi', 'kontragent', kid)
+    return jsonify({'status': 'ok'})
+
+
+# ----------------------------------------------------------------------------
+# Skladlar (omborlar)
+# ----------------------------------------------------------------------------
+@app.route('/api/skladlar', methods=['GET'])
+@login_required()
+def skladlar_list():
+    conn = get_db()
+    rows = conn.execute("SELECT * FROM skladlar ORDER BY nomi").fetchall()
+    conn.close()
+    return jsonify([dict(r) for r in rows])
+
+
+@app.route('/api/skladlar', methods=['POST'])
+@login_required('admin')
+def sklad_qosh():
+    d = request.json or {}
+    if not d.get('nomi'):
+        return jsonify({'error': 'Nomi majburiy'}), 400
+    conn = get_db()
+    cur = conn.execute("INSERT INTO skladlar (nomi,manzil,izoh) VALUES (?,?,?)",
+                       (d['nomi'], d.get('manzil', ''), d.get('izoh', '')))
+    conn.commit()
+    sid = cur.lastrowid
+    conn.close()
+    audit(request.user['username'], 'qoshdi', 'sklad', sid, d['nomi'])
+    return jsonify({'status': 'ok', 'id': sid})
+
+
+@app.route('/api/skladlar/<int:sid>', methods=['PUT'])
+@login_required('admin')
+def sklad_yangilash(sid):
+    d = request.json or {}
+    conn = get_db()
+    conn.execute("UPDATE skladlar SET nomi=?,manzil=?,izoh=? WHERE id=?",
+                 (d['nomi'], d.get('manzil', ''), d.get('izoh', ''), sid))
+    conn.commit()
+    conn.close()
+    audit(request.user['username'], 'tahrirladi', 'sklad', sid, d.get('nomi', ''))
+    return jsonify({'status': 'ok'})
+
+
+@app.route('/api/skladlar/<int:sid>', methods=['DELETE'])
+@login_required('admin')
+def sklad_ochir(sid):
+    conn = get_db()
+    conn.execute("DELETE FROM skladlar WHERE id=?", (sid,))
+    conn.commit()
+    conn.close()
+    audit(request.user['username'], 'ochirdi', 'sklad', sid)
+    return jsonify({'status': 'ok'})
+
+
+# ----------------------------------------------------------------------------
+# Menejerlar (ro'yxat)
+# ----------------------------------------------------------------------------
+@app.route('/api/menejerlar', methods=['GET'])
+@login_required()
+def menejerlar_list():
+    conn = get_db()
+    rows = conn.execute("SELECT * FROM menejerlar ORDER BY ism").fetchall()
+    conn.close()
+    return jsonify([dict(r) for r in rows])
+
+
+@app.route('/api/menejerlar', methods=['POST'])
+@login_required('admin')
+def menejer_qosh():
+    d = request.json or {}
+    if not d.get('ism'):
+        return jsonify({'error': 'Ism majburiy'}), 400
+    conn = get_db()
+    cur = conn.execute("INSERT INTO menejerlar (ism,telefon,izoh) VALUES (?,?,?)",
+                       (d['ism'], d.get('telefon', ''), d.get('izoh', '')))
+    conn.commit()
+    mid = cur.lastrowid
+    conn.close()
+    audit(request.user['username'], 'qoshdi', 'menejer', mid, d['ism'])
+    return jsonify({'status': 'ok', 'id': mid})
+
+
+@app.route('/api/menejerlar/<int:mid>', methods=['PUT'])
+@login_required('admin')
+def menejer_yangilash(mid):
+    d = request.json or {}
+    conn = get_db()
+    conn.execute("UPDATE menejerlar SET ism=?,telefon=?,izoh=? WHERE id=?",
+                 (d['ism'], d.get('telefon', ''), d.get('izoh', ''), mid))
+    conn.commit()
+    conn.close()
+    audit(request.user['username'], 'tahrirladi', 'menejer', mid, d.get('ism', ''))
+    return jsonify({'status': 'ok'})
+
+
+@app.route('/api/menejerlar/<int:mid>', methods=['DELETE'])
+@login_required('admin')
+def menejer_ochir(mid):
+    conn = get_db()
+    conn.execute("DELETE FROM menejerlar WHERE id=?", (mid,))
+    conn.commit()
+    conn.close()
+    audit(request.user['username'], 'ochirdi', 'menejer', mid)
     return jsonify({'status': 'ok'})
 
 
