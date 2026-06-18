@@ -2,3 +2,10 @@ ombor.db
 __pycache__/
 *.pyc
 data/
+
+# Telegram bot maxfiy fayllari (hech qachon yuklamang!)
+bot/.env
+.env
+bot/credentials.json
+credentials.json
+*.service-account.json
