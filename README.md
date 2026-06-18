@@ -57,6 +57,21 @@ docker run -d -p 5000:5000 -v $(pwd)/data:/app medstock-erp
 docker run -d -p 5000:5000 -e MEDSTOCK_SECRET="uzun-tasodifiy-kalit" medstock-erp
 ```
 
+## Telegram bot (shartnomalar → Google Sheets)
+
+`bot/` papkasida alohida **Telegram bot** mavjud: bemor shartnomalarini
+(ism, familiya, telefon, tashxis, implant, summa va h.k.) qadam-baqadam
+to'ldirib, har birini avtomatik **Google Sheets** jadvaliga yozadi.
+
+Sozlash va ishga tushirish bo'yicha to'liq o'zbekcha qo'llanma: [`bot/README.md`](bot/README.md).
+
+```bash
+cd bot
+pip install -r requirements.txt
+cp .env.example .env   # tokeningiz va jadval ID sini yozing
+python bot.py
+```
+
 ## Ma'lumotlar bazasi
 
 SQLite fayli `ombor.db` avtomatik yaratiladi. Zaxira nusxa olish uchun shu
